@@ -43,7 +43,6 @@ const App: React.FC = () => {
   return (
     <>
       {/* <Toaster /> */}
-
       <Suspense
         fallback={
           <div>
@@ -60,13 +59,23 @@ const App: React.FC = () => {
                 <Route
                   key={index}
                   path={route.path}
-                  element={<PublicRoute component={ComponentWithLayout} />}
+                  element={
+                    <PublicRoute
+                      role={route.role}
+                      component={ComponentWithLayout}
+                    />
+                  }
                 />
               ) : (
                 <Route
                   key={index}
                   path={route.path}
-                  element={<PrivateRoute component={ComponentWithLayout} />}
+                  element={
+                    <PrivateRoute
+                      role={route.role}
+                      component={ComponentWithLayout}
+                    />
+                  }
                 />
               );
             })}

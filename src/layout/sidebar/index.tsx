@@ -9,13 +9,13 @@ import { IoGiftOutline } from "react-icons/io5";
 import { Link, useLocation } from "react-router-dom";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
+import { setIsSidebarOpen } from "../../redux/features/userSlice";
 
 const Sidebar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
   const isSidebarOpen = useSelector((state: any) => state.user.isSidebarOpen);
-  const setIsSidebarOpen = useSelector((state: any) => state.setIsSidebarOpen);
 
   console.log(isSidebarOpen, "isSidebarOpen");
 
@@ -74,7 +74,7 @@ const Sidebar = () => {
         )}
 
         <div
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={() => dispatch(setIsSidebarOpen(!isSidebarOpen))}
           className="my-auto cursor-pointer rounded-md hover:bg-theme-secondaryBg mt-2"
         >
           {isSidebarOpen ? (
