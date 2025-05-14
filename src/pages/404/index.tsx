@@ -1,4 +1,3 @@
-import React from "react";
 import CustomBtn from "../../components/customBtn";
 
 const NotFound = () => {
