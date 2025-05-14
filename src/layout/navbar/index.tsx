@@ -1,19 +1,12 @@
 import React from "react";
-// import Cookies from "js-cookie";
-// import { motion } from "framer-motion";
-// import useStore from "../hooks/useStore";
+import { FiSun } from "react-icons/fi";
+import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-// import ThemesData from "../data/themeColorsData.json";
-// import UserImage from "../assests/navbar/user-img.png";
-// import { jwtDecode } from "jwt-decode";
-
-//  importing icons
-// import { FiSun } from "react-icons/fi";
-// import { FaRegMoon } from "react-icons/fa6";
 import { HiOutlineLogout } from "react-icons/hi";
-import { FaRegUserCircle } from "react-icons/fa";
 import { MdOutlineSettings } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { FaRegMoon, FaRegUserCircle } from "react-icons/fa";
+import { setAppMode } from "../../redux/features/userSlice";
 
 interface NavbarProps {
   userDetailsModel: boolean;
@@ -21,18 +14,14 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
+  const Navigate = useNavigate();
+  const dispatch = useDispatch();
   const { userDetailsModel, setUserDetailsModel } = props;
   const isSidebarOpen = useSelector((state: any) => state.user.isSidebarOpen);
-  // const setAppMode = useStore((state) => state.setAppMode);
-  // const isSidebarOpen = useStore((state) => state.isSidebarOpen);
-  // const appThemeColor = useStore((state) => state.appThemeColor);
-  // const setAppThemeColor = useStore((state) => state.setAppThemeColor);
-
-  const Navigate = useNavigate();
 
   // const UserData = jwtDecode(Cookies.get("token")).email;
   // console.log(JSON.parse(Cookies.get("token")).email);
-  const UserData = "mudassarmuhammad776@gmail.com";
+  const UserData = "Mudassar";
 
   const Links = [
     {
@@ -77,12 +66,13 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         />
 
         <div
-          className="flex cursor-pointer"
+          className="cursor-pointer flex items-center"
           onClick={() => setUserDetailsModel((toggle) => !toggle)}
         >
           <p className="text-center mx-2 my-auto text-theme-primary hidden sm:block">
             Welcome <b>{UserData}!</b>
           </p>
+          <FaUserCircle size={32} className="text-theme-btnBgText" />
           {/* <img
             src={UserImage}
             alt="user-profile"
@@ -93,7 +83,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         {/* Modal  */}
 
         {userDetailsModel && (
-          <div className="absolute right-6 md:right-14 top-16 px-4 py-4 bg-theme-primaryBg rounded-xl w-64 shadow-lg z-50">
+          <div className="absolute right-6 md:right-14 top-20 px-4 py-4 bg-theme-primaryBg rounded-xl w-64 shadow-lg z-50">
             {/* user name and image  */}
             <div className="flex gap-2">
               <span className="text-center my-auto">
@@ -118,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
               <div
                 key={item.name}
                 onClick={item.func}
-                className="flex text-theme-secondary my-3 mx-2 rounded-md py-2 px-3 hover:bg-theme-secondaryBg hover:text-theme-primary hover:cursor-pointer "
+                className="flex text-theme-secondary my-3 mx-2 rounded-md py-2 px-3 hover:bg-theme-secondaryBg hover:text-theme-primary hover:cursor-pointer hover:scale-105 animation ease-in-out duration-200"
               >
                 {item.icon}
                 <p className="px-3 font-semibold text-sm"> {item.name}</p>
@@ -128,84 +118,32 @@ const Navbar: React.FC<NavbarProps> = (props) => {
 
             <div className="border border-dashed border-theme-primaryBorder mt-4"></div>
 
-            <p className="text-theme-primary font-bold text-sm my-2">Color</p>
-
-            {/* Theme different colors button */}
-            {/* <div className="grid justify-stretch gap-2 grid-cols-2">
-              {ThemesData.themeColors.map((items : any) => (
-                <button
-                  key={items.name}
-                  disabled={appThemeColor === items.colorValue}
-                  onClick={() => {
-                    if (appThemeColor !== "") {
-                      document.documentElement.classList.remove(
-                        "redish",
-                        "bluish",
-                        "yellowish",
-                        "orangish",
-                        "greenish",
-                        "violetish"
-                      );
-                    }
-                    setAppThemeColor(items.colorValue);
-                  }}
-                  className="px-3 py-1 rounded-md flex text-sm text-theme-tertiary font-semibold border border-gray-200 hover:bg-theme-secondaryBg "
-                >
-                  <div
-                    className={`rounded-full mr-1 w-5 h-5 ${
-                      items.color === "bg-red-600"
-                        ? "bg-red-600"
-                        : items.color === "bg-blue-600"
-                        ? "bg-blue-600"
-                        : items.color === "bg-yellow-500"
-                        ? "bg-yellow-500"
-                        : items.color === "bg-orange-600"
-                        ? "bg-orange-600"
-                        : items.color === "bg-green-600"
-                        ? "bg-green-600"
-                        : items.color === "bg-violet-600"
-                        ? "bg-violet-600"
-                        : ""
-                    } `}
-                  ></div>
-                  <p>{items.name}</p>
-                </button>
-              ))}
-            </div> */}
-            {/* Theme different colors button ended */}
-
-            <div className="border border-dashed border-theme-primaryBorder mt-4"></div>
-
             <p className="text-theme-primary font-bold text-sm mt-2">Mode</p>
 
             {/* Dark and light mode button */}
-            {/* <div className="grid justify-stretch grid-cols-2 gap-2">
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
+            <div className="grid justify-stretch grid-cols-2 gap-2">
+              <button
                 onClick={() => {
                   document.documentElement.classList.add("dark");
-                  setAppMode("dark");
+                  dispatch(setAppMode("dark"));
                 }}
                 className="px-3 py-1 rounded-md flex text-sm text-gray-200 font-semibold border border-gray-200 bg-black hover:bg-stone-900 mt-2  justify-center"
               >
                 <FaRegMoon className="text-md text-gray-200  my-auto mr-2" />
                 <p>Dark</p>
-              </motion.button>
+              </button>
 
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
+              <button
                 onClick={() => {
                   document.documentElement.classList.remove("dark");
-                  setAppMode("light");
+                  dispatch(setAppMode("light"));
                 }}
                 className="px-3 py-1 rounded-md flex text-sm text-stone-700 font-semibold border border-gray-200 bg-white hover:bg-stone-100 mt-2 justify-center"
               >
                 <FiSun className="text-md text-stone-700 my-auto mr-2" />
                 <p>Light</p>
-              </motion.button>
-            </div> */}
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -12,6 +12,26 @@ const routes: Route[] = [
     isPublic: true,
     component: lazy(async () => import("../pages/posts")),
   },
+  {
+    path: "/comments",
+    isPublic: true,
+    component: lazy(async () => import("../pages/comments")),
+  },
+  {
+    path: "/users",
+    isPublic: true,
+    component: lazy(async () => import("../pages/users")),
+  },
+  {
+    path: "/profile",
+    isPublic: true,
+    component: lazy(async () => import("../pages/profile")),
+  },
+  {
+    path: "/userProfile/:userId",
+    isPublic: true,
+    component: lazy(async () => import("../pages/userProfile")),
+  },
 ];
 
 export default routes;

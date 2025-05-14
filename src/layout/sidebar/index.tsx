@@ -1,23 +1,22 @@
 import {
   MdOutlineDashboardCustomize,
   MdKeyboardDoubleArrowRight,
+  MdOutlineGolfCourse,
 } from "react-icons/md";
 import { useEffect } from "react";
-import { LuStore } from "react-icons/lu";
-import { LuUser } from "react-icons/lu";
-import { IoGiftOutline } from "react-icons/io5";
+import { LiaComments } from "react-icons/lia";
+import { PiUsersThree } from "react-icons/pi";
+import { AiOutlinePicture } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
-import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
+import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { setIsSidebarOpen } from "../../redux/features/userSlice";
+import { CgProfile } from "react-icons/cg";
 
 const Sidebar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
-
   const isSidebarOpen = useSelector((state: any) => state.user.isSidebarOpen);
-
-  console.log(isSidebarOpen, "isSidebarOpen");
 
   useEffect(() => {
     CloseSidebarOnSmallDevices();
@@ -35,23 +34,31 @@ const Sidebar = () => {
       name: "Dashboard",
       path: "/",
       icon: (
-        <MdOutlineDashboardCustomize className="text-2xl text-center my-auto" />
+        <MdOutlineDashboardCustomize
+          size={24}
+          className=" text-center my-auto"
+        />
       ),
     },
     {
       name: "Posts",
       path: "/posts",
-      icon: <LuStore className="text-2xl text-center my-auto" />,
+      icon: <AiOutlinePicture size={22} className=" text-center my-auto" />,
     },
     {
       name: "Comments",
       path: "/comments",
-      icon: <IoGiftOutline className="text-2xl text-center my-auto" />,
+      icon: <LiaComments size={24} className=" text-center my-auto" />,
     },
     {
       name: "Users",
       path: "/users",
-      icon: <LuUser className="text-2xl text-center my-auto" />,
+      icon: <PiUsersThree size={24} className=" text-center my-auto" />,
+    },
+    {
+      name: "Profile",
+      path: "/profile",
+      icon: <CgProfile size={22} className=" text-center my-auto" />,
     },
   ];
 
@@ -65,10 +72,13 @@ const Sidebar = () => {
       <div className="py-2 my-2 flex justify-around items-center">
         {isSidebarOpen && (
           <>
-            <LuStore className="bg-theme-btnBg text-4xl my-auto text-white p-2 rounded" />
+            <MdOutlineGolfCourse
+              size={34}
+              className="bg-theme-btnBg my-auto text-white p-1 rounded"
+            />
 
-            <h1 className="text-theme-primary font-bold text-2xl">
-              One's Store
+            <h1 className="text-theme-primary font-bold text-xl">
+              Golfguider
             </h1>
           </>
         )}
@@ -103,9 +113,9 @@ const Sidebar = () => {
             isSidebarOpen ? "mx-4" : "mx-2"
           }  ${
             location.pathname === item.path
-              ? "bg-theme-secondaryBg !text-theme-btnBgText shadow-md"
+              ? "bg-theme-secondaryBg !text-theme-btnBgText shadow-md scale-105"
               : ""
-          } hover:bg-theme-secondaryBg hover:text-theme-primary`}
+          } hover:bg-theme-secondaryBg hover:text-theme-primary hover:scale-105 animation ease-in-out duration-200`}
         >
           {item.icon}
           {isSidebarOpen && <p className="px-3 font-semibold"> {item.name}</p>}
@@ -115,14 +125,14 @@ const Sidebar = () => {
       {isSidebarOpen && (
         <div className="absolute bottom-3 left-1">
           <span className="text-xs text-theme-secondary font-semibold mx-2">
-            Developed by
+            Visit our app
           </span>
           <div>
             <Link
-              to={"https://dev-mudassar-portfolio.pantheonsite.io/"}
+              to={"https://google.com"}
               className="text-md font-semibold mx-2 text-theme-btnBgText"
             >
-              Muhammad Mudassar
+              Golfguider
             </Link>
           </div>
         </div>

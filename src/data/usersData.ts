@@ -1,0 +1,156 @@
+export const UsersData = [
+  {
+    id: 1,
+    name: "Alice Johnson",
+    username: "alice_j",
+    profilePicture:
+      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Explorer of the unknown. 🌍 Coffee enthusiast ☕",
+    joinDate: "2023-01-15",
+    followers: 1203,
+    following: 354,
+  },
+  {
+    id: 2,
+    name: "Bob Smith",
+    username: "bob_smith",
+    profilePicture:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Photographer 📸 Capturing life's moments.",
+    joinDate: "2022-11-30",
+    followers: 874,
+    following: 290,
+  },
+  {
+    id: 3,
+    name: "Catherine Lee",
+    username: "cathy_lee",
+    profilePicture:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Nature lover 🌿 Yoga and mindfulness practitioner.",
+    joinDate: "2021-08-20",
+    followers: 1564,
+    following: 482,
+  },
+  {
+    id: 4,
+    name: "David Parker",
+    username: "david_parker",
+    profilePicture:
+      "https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Tech geek 🚀 Software developer and gamer 🎮",
+    joinDate: "2020-05-10",
+    followers: 2054,
+    following: 689,
+  },
+  {
+    id: 5,
+    name: "Emily Davis",
+    username: "emily_d",
+    profilePicture:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Foodie 🍔, Travel blogger 🌎, Eternal optimist 🌈",
+    joinDate: "2024-03-05",
+    followers: 932,
+    following: 415,
+  },
+  {
+    id: 6,
+    name: "Frank Moore",
+    username: "frank_m",
+    profilePicture:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Running my way through life. 🏃‍♂️",
+    joinDate: "2023-07-21",
+    followers: 673,
+    following: 190,
+  },
+  {
+    id: 7,
+    name: "Grace Hill",
+    username: "grace_hill",
+    profilePicture:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Graphic designer 🎨 Visual storyteller.",
+    joinDate: "2019-09-15",
+    followers: 1345,
+    following: 602,
+  },
+  {
+    id: 8,
+    name: "Henry Adams",
+    username: "henry_adams",
+    profilePicture:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Hiker, biker, and everything in between. 🥾🚴",
+    joinDate: "2022-12-01",
+    followers: 758,
+    following: 321,
+  },
+  {
+    id: 9,
+    name: "Ivy Roberts",
+    username: "ivy_roberts",
+    profilePicture:
+      "https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Chef 🧑‍🍳 Sharing recipes and good vibes.",
+    joinDate: "2021-04-25",
+    followers: 1523,
+    following: 498,
+  },
+  {
+    id: 10,
+    name: "Jack White",
+    username: "jack_white",
+    profilePicture:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Adventurer 🌍 Exploring one city at a time.",
+    joinDate: "2023-06-15",
+    followers: 842,
+    following: 290,
+  },
+  {
+    id: 7,
+    name: "Grace Hill",
+    username: "grace_hill",
+    profilePicture:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Graphic designer 🎨 Visual storyteller.",
+    joinDate: "2019-09-15",
+    followers: 1345,
+    following: 602,
+  },
+  {
+    id: 8,
+    name: "Henry Adams",
+    username: "henry_adams",
+    profilePicture:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Hiker, biker, and everything in between. 🥾🚴",
+    joinDate: "2022-12-01",
+    followers: 758,
+    following: 321,
+  },
+  {
+    id: 9,
+    name: "Ivy Roberts",
+    username: "ivy_roberts",
+    profilePicture:
+      "https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Chef 🧑‍🍳 Sharing recipes and good vibes.",
+    joinDate: "2021-04-25",
+    followers: 1523,
+    following: 498,
+  },
+  {
+    id: 10,
+    name: "Jack White",
+    username: "jack_white",
+    profilePicture:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80",
+    bio: "Adventurer 🌍 Exploring one city at a time.",
+    joinDate: "2023-06-15",
+    followers: 842,
+    following: 290,
+  },
+];

@@ -1,7 +1,7 @@
 import Layout from "./layout";
 import routes from "./routes/allRoutes";
-import React, { Suspense } from "react";
-import { useDispatch } from "react-redux";
+import React, { Suspense, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import PublicRoute from "./routes/publicRoute";
 import PrivateRoute from "./routes/privateRoute";
 // import LoadingScreen from "./components/LoadingScreen";
@@ -11,6 +11,8 @@ import PrivateRoute from "./routes/privateRoute";
 // import { useLazyNotificationApiQuery } from "./services/apiService";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import LoadingScreen from "./components/loadingScreen";
+import { setAppMode } from "./redux/features/userSlice";
+import NotFound from "./pages/404";
 
 interface RouteConfig {
   path: string;
@@ -40,6 +42,31 @@ function withLayout(
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
+  const appMode = useSelector((state: any) => state.user.appMode);
+
+  useEffect(() => {
+    CheckTheme();
+    document.documentElement.classList.add("greenish");
+  }, []);
+
+  const CheckTheme = () => {
+    if (appMode === "") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add("dark");
+        dispatch(setAppMode("dark"));
+      } else {
+        document.documentElement.classList.remove("dark");
+        dispatch(setAppMode("light"));
+      }
+    } else if (appMode !== "" && appMode === "dark") {
+      document.documentElement.classList.add("dark");
+      dispatch(setAppMode("dark"));
+    } else if (appMode !== "" && appMode === "light") {
+      document.documentElement.classList.remove("dark");
+      dispatch(setAppMode("light"));
+    }
+  };
+
   return (
     <>
       {/* <Toaster /> */}
@@ -79,6 +106,8 @@ const App: React.FC = () => {
                 />
               );
             })}
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </Suspense>

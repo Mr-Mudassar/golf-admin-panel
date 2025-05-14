@@ -8,7 +8,7 @@ const Layout = ({ children }: PropsWithChildren) => {
   const [userDetailsModel, setUserDetailsModel] = useState(false);
 
   return (
-    <div>
+    <div className="bg-theme-secondaryBg">
       <Navbar
         userDetailsModel={userDetailsModel}
         setUserDetailsModel={setUserDetailsModel}
