@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { setIsSidebarOpen } from "../../redux/features/userSlice";
 import { CgProfile } from "react-icons/cg";
+import { ImHistory } from "react-icons/im";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -23,23 +24,23 @@ const Sidebar = () => {
   });
 
   const CloseSidebarOnSmallDevices = () => {
-    if (window.innerWidth < 620) {
+    if (window.innerWidth < 1024) {
       dispatch(setIsSidebarOpen(false));
     }
   };
 
   //  Links on sidebar
   const RoutesData = [
-    {
-      name: "Dashboard",
-      path: "/",
-      icon: (
-        <MdOutlineDashboardCustomize
-          size={24}
-          className=" text-center my-auto"
-        />
-      ),
-    },
+    // {
+    //   name: "Dashboard",
+    //   path: "/",
+    //   icon: (
+    //     <MdOutlineDashboardCustomize
+    //       size={24}
+    //       className=" text-center my-auto"
+    //     />
+    //   ),
+    // },
     {
       name: "Posts",
       path: "/posts",
@@ -54,6 +55,11 @@ const Sidebar = () => {
       name: "Users",
       path: "/users",
       icon: <PiUsersThree size={24} className=" text-center my-auto" />,
+    },
+    {
+      name: "User Activities",
+      path: "/userActivities",
+      icon: <ImHistory size={24} className=" text-center my-auto" />,
     },
     {
       name: "Profile",
@@ -77,9 +83,7 @@ const Sidebar = () => {
               className="bg-theme-btnBg my-auto text-white p-1 rounded"
             />
 
-            <h1 className="text-theme-primary font-bold text-xl">
-              Golfguider
-            </h1>
+            <h1 className="text-theme-primary font-bold text-xl">Golfguider</h1>
           </>
         )}
 

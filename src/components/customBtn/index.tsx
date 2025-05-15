@@ -29,7 +29,7 @@ const FillBtn: React.FC<CustomBtnProps> = (props) => {
       disabled={disabled}
       onClick={handleOnClick}
       className={`
-         text-md bg-theme-btnBg text-theme-btnColor px-2 py-2
+         text-md bg-theme-btnBg text-theme-btnColor rounded-lg font-semibold px-4 py-2
         ${className}
       `}
     >

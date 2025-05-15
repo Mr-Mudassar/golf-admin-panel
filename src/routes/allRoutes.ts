@@ -32,6 +32,11 @@ const routes: Route[] = [
     isPublic: true,
     component: lazy(async () => import("../pages/userProfile")),
   },
+  {
+    path: "/userActivities",
+    isPublic: true,
+    component: lazy(async () => import("../pages/userAvtivityLogs")),
+  },
 ];
 
 export default routes;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ActionMenu from "../actionMenu";
 import CustomModal from "../customModal";
+import { useNavigate } from "react-router";
 import { VscComment } from "react-icons/vsc";
 import { IoMdShareAlt } from "react-icons/io";
 import { HiDotsVertical } from "react-icons/hi";
@@ -9,22 +10,26 @@ import { GoHeart, GoHeartFill } from "react-icons/go";
 
 interface PostComponentProps {
   data: any;
+  textSize?: string;
+  showIconNames?: boolean;
+  iconsSize?: number;
 }
 
 const PostComponent: React.FC<PostComponentProps> = (props) => {
-  const { data } = props;
+  const navigate = useNavigate();
   const [likedPost, setLikedPost] = useState(false);
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const toggleCommentsModal = () => setShowCommentsModal(!showCommentsModal);
+  const { data, iconsSize = 22, textSize = "sm", showIconNames = true } = props;
 
   const ActionOnPosts = [
     {
       name: "Like",
       icon: likedPost ? (
-        <GoHeartFill size={22} className="text-theme-primary" />
+        <GoHeartFill size={iconsSize} className="text-theme-primary" />
       ) : (
-        <GoHeart size={22} className="text-theme-secondary" />
+        <GoHeart size={iconsSize} className="text-theme-secondary" />
       ),
       cout: 2 + (likedPost ? 1 : 0),
       border: true,
@@ -35,7 +40,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
     },
     {
       name: "Comment",
-      icon: <VscComment size={22} className="text-theme-secondary" />,
+      icon: <VscComment size={iconsSize} className="text-theme-secondary" />,
       cout: "2",
       border: true,
       action: () => {
@@ -45,7 +50,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
     },
     {
       name: "Share",
-      icon: <IoMdShareAlt size={24} className="text-theme-primary" />,
+      icon: <IoMdShareAlt size={iconsSize} className="text-theme-primary" />,
       cout: "2",
       border: false,
       action: () => {
@@ -55,17 +60,24 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
   ];
 
   return (
-    <div className="border border-theme-primaryBorder rounded-xl mb-4 pt-2 bg-theme-primaryBg">
+    <div className="border border-theme-primaryBorder rounded-xl mb-4 bg-theme-primaryBg flex flex-col h-full">
       <div>
-        <div className="flex justify-between items-center  m-4">
-          <span className="flex gap-4">
+        <div className="flex justify-between items-center m-4">
+          <span
+            className="flex gap-2 cursor-pointer"
+            onClick={() =>
+              navigate(`/userProfile/${data?.user?.id}`, {
+                state: { profileData: data?.user },
+              })
+            }
+          >
             <img
               src={data?.user?.profilePicture}
               alt={data?.user?.profilePicture}
               className="rounded-full"
             />
             <span>
-              <h1 className="text-lg text-theme-primary font-semibold ">
+              <h1 className="text-md text-theme-primary font-semibold">
                 {data?.user?.name}
               </h1>
               <p className="text-theme-secondary text-sm">1 day ago</p>
@@ -86,13 +98,13 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
           {data.caption}
         </p>
       </div>
-      <img src={data.image} alt={data.caption} />
+      <img src={data.image} alt={data.caption} className="mb-auto" />
 
-      {/* Like, Comment and Share buttons */}
-      <div className="grid grid-cols-3">
+      {/* Like, Comment, and Share buttons */}
+      <div className="grid grid-cols-3 border-t border-theme-primaryBorder">
         {ActionOnPosts.map((item, index) => (
           <div
-            key={index}
+            key={index + 2}
             className={`flex items-center justify-center cursor-pointer py-4 gap-2 ${
               item.border ? "border-r border-theme-primaryBorder" : ""
             }`}
@@ -102,7 +114,11 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
               {item.icon}
               <p className="text-sm text-theme-secondary">({item.cout})</p>
             </span>
-            <p className="text-md text-theme-secondary">{item.name}</p>
+            {showIconNames && (
+              <p className={`text-${textSize} text-theme-secondary`}>
+                {item.name}
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -115,6 +131,8 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
         description={<CommentsComponent />}
         modelSize="w-[80%] md:w-[60%] lg:w-[40%]"
       />
+
+     
     </div>
   );
 };

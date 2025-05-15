@@ -1,18 +1,14 @@
 import Layout from "./layout";
+import NotFound from "./pages/404";
 import routes from "./routes/allRoutes";
-import React, { Suspense, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Toaster } from "react-hot-toast";
 import PublicRoute from "./routes/publicRoute";
 import PrivateRoute from "./routes/privateRoute";
-// import LoadingScreen from "./components/LoadingScreen";
-// import { updateFcmToken } from "./features/auth/authSlice";
-// import { Toaster } from "react-hot-toast";
-// import NotificationToaster from "./components/Notifica/tionToaster";
-// import { useLazyNotificationApiQuery } from "./services/apiService";
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import React, { Suspense, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingScreen from "./components/loadingScreen";
 import { setAppMode } from "./redux/features/userSlice";
-import NotFound from "./pages/404";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
 
 interface RouteConfig {
   path: string;
@@ -69,7 +65,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* <Toaster /> */}
+      <Toaster />
       <Suspense
         fallback={
           <div>

@@ -38,24 +38,33 @@ const Users = () => {
       selector: (row: any) => row.following,
     },
     {
+      name: "Role",
+      sortable: true,
+      selector: () => (
+        <p className="rounded-full bg-theme-btnBg font-semibold text-sm text-theme-btnColor p-2 px-4 flex w-max">
+          Gold
+        </p>
+      ),
+    },
+    {
       name: "Joining Date",
       sortable: true,
       selector: (row: any) => row.joinDate,
     },
-    {
-      name: "Actions",
-      sortable: true,
-      selector: () => (
-        <span className="relative">
-          <HiDotsVertical
-            size={34}
-            onClick={() => setShowActionMenu(!showActionMenu)}
-            className="text-theme-primary hover:bg-theme-secondaryBg p-1 cursor-pointer rounded-lg"
-          />
-          <div>{showActionMenu && <ActionMenu />}</div>
-        </span>
-      ),
-    },
+    // {
+    //   name: "Actions",
+    //   sortable: true,
+    //   selector: () => (
+    //     <span className="relative">
+    //       <HiDotsVertical
+    //         size={34}
+    //         onClick={() => setShowActionMenu(!showActionMenu)}
+    //         className="text-theme-primary hover:bg-theme-secondaryBg p-1 cursor-pointer rounded-lg"
+    //       />
+    //       <div>{showActionMenu && <ActionMenu />}</div>
+    //     </span>
+    //   ),
+    // },
   ];
 
   return (
@@ -70,18 +79,20 @@ const Users = () => {
             pagination={true}
             allData={UsersData}
             selectableRows={true}
+            userCursorPointer={true}
             totalRows={UsersData.length}
             tableHeadings={UsersTableHeadings}
             onRowClicked={(rowData: any) =>
-              navigate("/userProfile/" + rowData.id, {state : {profileData : rowData}} )
+              navigate("/userProfile/" + rowData.id, {
+                state: { profileData: rowData },
+              })
             }
             //   onChangePage,
             //   expandableRows,
             //   isOverflowVisible,
             //   ExpandedComponent,
-            //   onChangeRowsPerPage,
+            // onChangeRowsPerPage,
             //   selectableRowDisabled,
-            //   userCursorPointer = false,
             //   handleSelectedRowsChange,
           />
         </div>
