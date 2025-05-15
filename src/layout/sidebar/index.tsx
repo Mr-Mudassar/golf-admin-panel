@@ -1,9 +1,10 @@
 import {
-  MdOutlineDashboardCustomize,
-  MdKeyboardDoubleArrowRight,
   MdOutlineGolfCourse,
+  MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 import { useEffect } from "react";
+import { CgProfile } from "react-icons/cg";
+import { ImHistory } from "react-icons/im";
 import { LiaComments } from "react-icons/lia";
 import { PiUsersThree } from "react-icons/pi";
 import { AiOutlinePicture } from "react-icons/ai";
@@ -11,8 +12,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { setIsSidebarOpen } from "../../redux/features/userSlice";
-import { CgProfile } from "react-icons/cg";
-import { ImHistory } from "react-icons/im";
 
 const Sidebar = () => {
   const location = useLocation();

@@ -1,13 +1,9 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
-import { HiDotsVertical } from "react-icons/hi";
 import { UsersData } from "../../data/usersData";
 import DataTable from "../../components/dataTable";
-import ActionMenu from "../../components/actionMenu";
 
 const Users = () => {
   const navigate = useNavigate();
-  const [showActionMenu, setShowActionMenu] = useState(false);
 
   const UsersTableHeadings = [
     {
