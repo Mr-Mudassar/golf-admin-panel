@@ -75,7 +75,7 @@ const Model: React.FC<ModelProps> = ({
                 type="button"
                 text={buttonText}
                 handleOnClick={buttonFunc}
-                className={`font-normal cursor-pointer bg-  ${buttonStyles}`}
+                className={`font-normal cursor-pointer ${buttonStyles}`}
               />
             )}
           </div>
