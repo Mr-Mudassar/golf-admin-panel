@@ -1,56 +1,69 @@
-import { useState, useEffect } from "react";
-import { ALL_POSTS_DATA } from "../../data/posts";
+import { useQuery } from "@apollo/client";
+import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPage, setPosts } from "../../redux/features/userSlice";
+import LoadingScreen from "../../components/loadingScreen";
 import PostComponent from "../../components/postComponent";
-import LoadingScreen from "../../components/loadingScreen"; // Import the LoadingScreen component
+import { GET_POSTS_BY_CIRCLE } from "../../redux/features/queries";
 
 const Posts = () => {
-  const [posts, setPosts] = useState<any[]>([]); // State to store loaded posts
-  const [page, setPage] = useState(1); // Current page
-  const [hasMore, setHasMore] = useState(true); // Whether more data is available
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const dispatch = useDispatch();
+  const isFetching = useRef(false);
+  // const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const page = useSelector((state: any) => state.user.page);
+  const posts = useSelector((state: any) => state.user.posts);
 
-  const POSTS_PER_PAGE = 10; // Number of posts to load per page
-
-  // Function to load posts
-  const loadPosts = () => {
-    setIsLoading(true); // Show loading screen
-    const startIndex = (page - 1) * POSTS_PER_PAGE;
-    const endIndex = startIndex + POSTS_PER_PAGE;
-
-    // Simulate fetching paginated data
-    const newPosts = ALL_POSTS_DATA.slice(startIndex, endIndex);
-
-    if (newPosts.length === 0) {
-      setHasMore(false); // No more data to load
-    } else {
-      setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+  const { data: allPostData, loading: allPostLoading } = useQuery(
+    GET_POSTS_BY_CIRCLE,
+    {
+      variables: { page },
+      fetchPolicy: "network-only",
     }
+  );
 
-    setIsLoading(false); // Hide loading screen
-  };
-
-  // Handle scroll event
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop >=
-      document.documentElement.offsetHeight - 200
-    ) {
-      setPage((prevPage) => prevPage + 1); // Increment page when scrolled to bottom
-    }
-  };
-
-  // Fetch posts when page changes
+  // Add new posts when data changes
   useEffect(() => {
-    if (hasMore) {
-      loadPosts();
-    }
-  }, [page]);
+    if (allPostData?.getPostByCricle?.values?.length > 0) {
+      console.log(
+        "length on each new fetchhhhhhhhhhhh",
+        allPostData.getPostByCricle.values.length
+      );
 
-  // Attach scroll event listener
+      const newPosts = allPostData.getPostByCricle.values.filter(
+        (newPost: any) =>
+          !posts.some(
+            (existingPost: any) => existingPost.postid === newPost.postid
+          )
+      );
+      dispatch(setPosts([...posts, ...newPosts]));
+      if (allPostData.getPostByCricle.values.length < 10) setHasMore(false);
+    }
+    //  else if (page > 1) {
+    //   setHasMore(false);
+    // }
+    isFetching.current = false;
+  }, [allPostData, page]);
+
+  console.log("Has moreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", hasMore, page, posts);
+
+  // Simple scroll handler with flag
   useEffect(() => {
+    const handleScroll = () => {
+      if (
+        hasMore &&
+        !allPostLoading &&
+        !isFetching.current &&
+        window.innerHeight + document.documentElement.scrollTop >=
+          document.documentElement.offsetHeight - 100
+      ) {
+        isFetching.current = true;
+        dispatch(setPage(page + 1));
+      }
+    };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll); // Cleanup
-  }, []);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasMore, allPostLoading]);
 
   return (
     <>
@@ -59,7 +72,7 @@ const Posts = () => {
       </h1>
       <div className="flex flex-col items-center justify-center">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 w-full">
-          {posts.map((item, index) => (
+          {posts.map((item: any, index: number) => (
             <PostComponent
               key={index}
               data={item}
@@ -69,9 +82,11 @@ const Posts = () => {
             />
           ))}
         </div>
-        {isLoading && <LoadingScreen />} {/* Show LoadingScreen when loading */}
-        {!hasMore && !isLoading && (
-          <p className="text-theme-secondary mt-4">No more posts to load.</p>
+        {allPostLoading && <LoadingScreen />}
+        {!hasMore && !allPostLoading && (
+          <p className="text-theme-secondary m-24 font-semibold text-xl">
+            No more posts to load.
+          </p>
         )}
       </div>
     </>

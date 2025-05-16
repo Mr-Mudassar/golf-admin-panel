@@ -7,7 +7,7 @@ import PrivateRoute from "./routes/privateRoute";
 import React, { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LoadingScreen from "./components/loadingScreen";
-import { setAppMode } from "./redux/features/userSlice";
+import { setAppMode, setToken } from "./redux/features/userSlice";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 
 interface RouteConfig {
@@ -39,6 +39,14 @@ function withLayout(
 const App: React.FC = () => {
   const dispatch = useDispatch();
   const appMode = useSelector((state: any) => state.user.appMode);
+
+  useEffect(() => {
+    dispatch(
+      setToken(
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMGZiNDViOS1iYjkwLTQzMDYtOTRjYS02MjMxYjk1YTNjYmUiLCJlbWFpbCI6ImJpbGFsQHNldHViby5jb20iLCJpYXQiOjE3NDczMjk2ODEsImV4cCI6MTc0OTkyMTY4MX0.WGsyrz5BIwy-8h8KDzYP1E-pmPNmGgoKbGndI7zPbvQ"
+      )
+    );
+  }, []);
 
   useEffect(() => {
     CheckTheme();

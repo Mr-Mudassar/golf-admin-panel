@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ActionMenu from "../actionMenu";
 import CustomModal from "../customModal";
+import MediaLoading from "../mediaLoading";
 import { useNavigate } from "react-router";
 import { VscComment } from "react-icons/vsc";
 import { IoMdShareAlt } from "react-icons/io";
@@ -31,7 +32,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
       ) : (
         <GoHeart size={iconsSize} className="text-theme-secondary" />
       ),
-      cout: 2 + (likedPost ? 1 : 0),
+      cout: data?.like_Count,
       border: true,
       action: () => {
         setLikedPost(!likedPost);
@@ -41,7 +42,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
     {
       name: "Comment",
       icon: <VscComment size={iconsSize} className="text-theme-secondary" />,
-      cout: "2",
+      cout: data?.comment_count,
       border: true,
       action: () => {
         toggleCommentsModal();
@@ -51,7 +52,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
     {
       name: "Share",
       icon: <IoMdShareAlt size={iconsSize} className="text-theme-primary" />,
-      cout: "2",
+      cout: data?.share_Count,
       border: false,
       action: () => {
         console.log("Share action");
@@ -71,14 +72,16 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
               })
             }
           >
-            <img
-              src={data?.user?.profilePicture}
-              alt={data?.user?.profilePicture}
-              className="rounded-full"
-            />
+            {data?.userInfo?.photo_profile && (
+              <img
+                src={data?.userInfo?.photo_profile}
+                alt={data?.userInfo?.photo_profile}
+                className="rounded-full w-14 h-14 object-cover"
+              />
+            )}
             <span>
               <h1 className="text-md text-theme-primary font-semibold">
-                {data?.user?.name}
+                {data?.userInfo?.first_name + " " + data?.userInfo?.last_name}
               </h1>
               <p className="text-theme-secondary text-sm">1 day ago</p>
             </span>
@@ -90,39 +93,38 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
               onClick={() => setShowActionMenu(!showActionMenu)}
               className="text-theme-primary hover:bg-theme-secondaryBg p-1 cursor-pointer rounded-lg"
             />
-            {showActionMenu && <ActionMenu />}
+            {showActionMenu && <ActionMenu postData={data} />}
           </div>
         </div>
 
         <p className="text-md text-theme-primary font-semibold px-4 mb-2">
-          {data.caption}
+          {data?.description}
         </p>
       </div>
-      <img src={data.image} alt={data.caption} className="mb-auto" />
-
-      {/* Like, Comment, and Share buttons */}
-      <div className="grid grid-cols-3 border-t border-theme-primaryBorder">
-        {ActionOnPosts.map((item, index) => (
-          <div
-            key={index + 2}
-            className={`flex items-center justify-center cursor-pointer py-4 gap-2 ${
-              item.border ? "border-r border-theme-primaryBorder" : ""
-            }`}
-            onClick={item.action}
-          >
-            <span className="flex justify-center items-center">
-              {item.icon}
-              <p className="text-sm text-theme-secondary">({item.cout})</p>
-            </span>
-            {showIconNames && (
-              <p className={`text-${textSize} text-theme-secondary`}>
-                {item.name}
-              </p>
-            )}
-          </div>
-        ))}
+      {data?.has_media && <MediaLoading postId={data.postid} />}
+      <div className="mt-auto">
+        <section className="grid grid-cols-3 border-t border-theme-primaryBorder ">
+          {ActionOnPosts.map((item, index) => (
+            <div
+              key={index + 2}
+              className={`flex items-center justify-center cursor-pointer py-2 gap-2 ${
+                item.border ? "border-r border-theme-primaryBorder" : ""
+              }`}
+              onClick={item.action}
+            >
+              <span className="flex justify-center items-center">
+                {item.icon}
+                <p className="text-sm text-theme-secondary">({item.cout})</p>
+              </span>
+              {showIconNames && (
+                <p className={`text-${textSize} text-theme-secondary`}>
+                  {item.name}
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
       </div>
-
       <CustomModal
         rounded="rounded-xl"
         heading={"All comments"}
@@ -131,8 +133,6 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
         description={<CommentsComponent />}
         modelSize="w-[80%] md:w-[60%] lg:w-[40%]"
       />
-
-     
     </div>
   );
 };
