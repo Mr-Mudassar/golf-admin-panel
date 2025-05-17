@@ -4,7 +4,8 @@ import { setContext } from "@apollo/client/link/context";
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 
 const httpLink = createHttpLink({
-  uri: "https://golfguiders-be-v2-884454497650.us-west1.run.app/graphql",
+  // uri: "https://golfguiders-be-v2-884454497650.us-west1.run.app/graphql",
+  uri: "https://golfguiders-administration-884454497650.us-west1.run.app",
 });
 
 const authLink = setContext((_, { headers }) => {
