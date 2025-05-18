@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPage, setPosts } from "../../redux/features/userSlice";
 import LoadingScreen from "../../components/loadingScreen";
 import PostComponent from "../../components/postComponent";
-import { GET_POSTS_BY_CIRCLE } from "../../redux/features/queries";
+import { GET_ALL_USER_POST } from "../../redux/features/queries";
 
 const Posts = () => {
   const dispatch = useDispatch();
@@ -15,7 +15,7 @@ const Posts = () => {
   const posts = useSelector((state: any) => state.user.posts);
 
   const { data: allPostData, loading: allPostLoading } = useQuery(
-    GET_POSTS_BY_CIRCLE,
+    GET_ALL_USER_POST,
     {
       variables: { page },
       fetchPolicy: "network-only",
@@ -24,20 +24,20 @@ const Posts = () => {
 
   // Add new posts when data changes
   useEffect(() => {
-    if (allPostData?.getPostByCricle?.values?.length > 0) {
+    if (allPostData?.getAllUserPost?.values?.length > 0) {
       console.log(
         "length on each new fetchhhhhhhhhhhh",
-        allPostData.getPostByCricle.values.length
+        allPostData.getAllUserPost.values.length
       );
 
-      const newPosts = allPostData.getPostByCricle.values.filter(
+      const newPosts = allPostData.getAllUserPost.values.filter(
         (newPost: any) =>
           !posts.some(
             (existingPost: any) => existingPost.postid === newPost.postid
           )
       );
       dispatch(setPosts([...posts, ...newPosts]));
-      if (allPostData.getPostByCricle.values.length < 10) setHasMore(false);
+      if (allPostData.getAllUserPost.values.length < 10) setHasMore(false);
     }
     //  else if (page > 1) {
     //   setHasMore(false);

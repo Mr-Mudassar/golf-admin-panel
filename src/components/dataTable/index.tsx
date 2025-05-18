@@ -107,6 +107,7 @@ const DataTableComponent = <T,>({
         paginationServer
         highlightOnHover
         pagination={pagination}
+        paginationPerPage={10}
         customStyles={customStyles}
         onRowClicked={onRowClicked}
         onChangePage={onChangePage}
@@ -118,7 +119,7 @@ const DataTableComponent = <T,>({
         selectableRowDisabled={selectableRowDisabled}
         onSelectedRowsChange={handleSelectedRowsChange}
         className="!overflow-y-visible !overflow-x-visible"
-        paginationRowsPerPageOptions={[10, 20, 30, 50, 75, 100]}
+        // paginationRowsPerPageOptions={[10, 20, 30, 50, 75, 100]}
         columns={tableHeadings as unknown as DataTableColumn<T>[]}
       />
     </div>

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const GET_POSTS_BY_CIRCLE = gql`
-  query GetPostsByCircle($page: Float!) {
-    getPostByCricle(page: $page) {
+export const GET_ALL_USER_POST = gql`
+  query GetAllUserPost($page: Float!) {
+    getAllUserPost(page: $page) {
       values {
         userInfo {
           type
@@ -68,5 +68,46 @@ export const DELETE_POST = gql`
       groupTags: $groupTags
       postCreated: $postCreated
     )
+  }
+`;
+
+export const GET_ALL_USER = gql`
+  query getAllUsers($page: Float!) {
+    getAllUsers(page: $page) {
+      userid
+      first_name
+      last_name
+      email
+      photo_profile
+      city
+      state
+      country
+    }
+  }
+`;
+
+export const GET_USER_PROFILE = gql`
+  query GetUser($userId: String, $email: String) {
+    getUser(userId: $userId, email: $email) {
+      first_name
+      last_name
+      email
+      created
+      userid
+      postalcode
+      address
+      bio
+      city
+      country
+      photo_profile
+      type
+      photo_cover
+      state
+      phone
+      status
+      hobbies
+      gender
+      has_profile_completed
+    }
   }
 `;
