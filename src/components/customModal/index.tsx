@@ -1,6 +1,6 @@
+import CustomBtn from "../customBtn";
 import { RxCross2 } from "react-icons/rx";
 import React, { useEffect, memo, type ReactNode } from "react";
-import CustomBtn from "../customBtn";
 
 interface ModelProps {
   rounded?: string;
@@ -13,6 +13,7 @@ interface ModelProps {
   buttonText?: string;
   buttonStyles?: string;
   buttonFunc?: () => void;
+  buttonLoading?: boolean;
   heading: string | ReactNode;
   description?: ReactNode | string;
 }
@@ -30,6 +31,7 @@ const Model: React.FC<ModelProps> = ({
   cancelBtn = false,
   modelSize = "w-lg",
   rounded = "rounded-xl",
+  buttonLoading = true,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -74,6 +76,7 @@ const Model: React.FC<ModelProps> = ({
                 icon=""
                 type="button"
                 text={buttonText}
+                isLoading={buttonLoading}
                 handleOnClick={buttonFunc}
                 className={`font-normal cursor-pointer ${buttonStyles}`}
               />
@@ -85,4 +88,4 @@ const Model: React.FC<ModelProps> = ({
   );
 };
 
-export default memo(Model);
+ export default memo(Model);

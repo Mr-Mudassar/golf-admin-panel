@@ -12,8 +12,10 @@ export interface TableColumn<T> {
 
 export interface DataTableComponentProps<T> {
   totalRows?: number;
+  loading?: boolean;
   pagination?: boolean;
   allData: T[];
+  paginationPerPage: number;
   expandableRows?: boolean;
   selectableRows?: boolean;
   userCursorPointer?: boolean;
@@ -35,6 +37,7 @@ export interface DataTableComponentProps<T> {
 
 const DataTableComponent = <T,>({
   allData,
+  loading = false,
   totalRows,
   onChangePage,
   onRowClicked,
@@ -42,6 +45,7 @@ const DataTableComponent = <T,>({
   expandableRows,
   selectableRows,
   isOverflowVisible,
+  paginationPerPage,
   ExpandedComponent,
   pagination = false,
   onChangeRowsPerPage,
@@ -107,20 +111,26 @@ const DataTableComponent = <T,>({
         paginationServer
         highlightOnHover
         pagination={pagination}
-        paginationPerPage={10}
         customStyles={customStyles}
         onRowClicked={onRowClicked}
         onChangePage={onChangePage}
         paginationTotalRows={totalRows}
         selectableRows={selectableRows}
         expandableRows={expandableRows}
+        paginationPerPage={paginationPerPage}
         onChangeRowsPerPage={onChangeRowsPerPage}
         expandableRowsComponent={ExpandedComponent}
         selectableRowDisabled={selectableRowDisabled}
         onSelectedRowsChange={handleSelectedRowsChange}
-        className="!overflow-y-visible !overflow-x-visible"
-        // paginationRowsPerPageOptions={[10, 20, 30, 50, 75, 100]}
         columns={tableHeadings as unknown as DataTableColumn<T>[]}
+        persistTableHead
+        progressPending={loading}
+        noDataComponent={
+          <div className="text-theme-primary p-4">No records found</div>
+        }
+        paginationComponentOptions={{
+          noRowsPerPage: true,
+        }}
       />
     </div>
   );

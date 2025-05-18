@@ -3,12 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 export const UserSlice = createSlice({
   name: "user",
   initialState: {
-    posts: [],
     page: 1,
+    posts: [],
     user: null,
     token: null,
     appMode: "light",
     isSidebarOpen: true,
+    allUser: [],
+    allUserPage: 1,
   },
 
   reducers: {
@@ -27,9 +29,22 @@ export const UserSlice = createSlice({
     setPage: (state, action) => {
       state.page = action.payload;
     },
+    setAllUser: (state, action) => {
+      state.allUser = action.payload;
+    },
+    setAllUserPage: (state, action) => {
+      state.allUserPage = action.payload;
+    },
   },
 });
 
-export const { setIsSidebarOpen, setAppMode, setToken, setPosts, setPage } =
-  UserSlice.actions;
+export const {
+  setIsSidebarOpen,
+  setAppMode,
+  setToken,
+  setPosts,
+  setPage,
+  setAllUser,
+  setAllUserPage,
+} = UserSlice.actions;
 export default UserSlice.reducer;

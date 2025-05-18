@@ -1,13 +1,19 @@
+import {
+  DELETE_USER,
+  GET_USER_PROFILE,
+  GET_ALL_POST_OF_SINGLE_USER,
+  GET_USER_FRIEND_LIST,
+} from "../../redux/features/queries";
 import { TbEdit } from "react-icons/tb";
-import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
+import Spinner from "../../components/spinner";
 import { ALL_POSTS_DATA } from "../../data/posts";
 import CustomModal from "../../components/customModal";
+import { useMutation, useQuery } from "@apollo/client";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import PostComponent from "../../components/postComponent";
-import { GET_USER_PROFILE } from "../../redux/features/queries";
 import { useLocation, useNavigate, useParams } from "react-router";
-import Spinner from "../../components/spinner";
+import toast from "react-hot-toast";
 
 const UserProfile = () => {
   const location = useLocation();
@@ -20,8 +26,7 @@ const UserProfile = () => {
     !userId && navigate("/users");
   }, []);
 
-  // console.log("Profile dataaaaaaaaaaaaaaaaaaaaa", ProfileData);
-
+  // user profile detials api call
   const {
     data: userProfileDetails,
     loading: profileDetailsLoading,
@@ -33,15 +38,59 @@ const UserProfile = () => {
     },
   });
 
-  console.log(
-    "Response from profile apiiiiiiiiiiiiiiiiii",
-    userProfileDetails,
-    profileDetailsError,
-    profileDetailsLoading
-  );
+  //user friend get api call
+  const {
+    data: userFriendData,
+    loading: userFriendLoading,
+    error: userFriendError,
+  } = useQuery(GET_USER_FRIEND_LIST, {
+    variables: {
+      pageState: 1,
+    },
+  });
+
+  // console.log(
+  //   "Response from user friend apiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
+  //   userFriendData?.getUserFriendList.values,
+  //   userFriendError,
+  //   userFriendLoading
+  // );
+
+  // user post get api call
+  const {
+    data: userPostData,
+    loading: userPostLoading,
+    error: userPostError,
+  } = useQuery(GET_ALL_POST_OF_SINGLE_USER, {
+    variables: {
+      userId: userProfileDetails?.getUser[0]?.userid,
+      page: 1,
+    },
+  });
+
+  // delete User api call
+  const [deleteUser, { loading: DeleteLoading }] = useMutation(DELETE_USER, {
+    variables: {
+      type: userProfileDetails?.getUser[0]?.type,
+    },
+    onCompleted: (e) => {
+      e.deleteUser
+        ? (navigate("/users"), toast.success("User Deleted Successfully"))
+        : toast.error("Error deleting user"),
+        setShowDeleteProfileModal(false);
+    },
+    onError: () => {
+      toast.error("Error Deleting User"), setShowDeleteProfileModal(false);
+    },
+  });
 
   return (
     <>
+      {profileDetailsError && (
+        <p className="p-12 text-red-600 bg-red-100 border-red-600 rounded-md font-semibold text-lg">
+          Failed to get User Profile details
+        </p>
+      )}
       {profileDetailsLoading ? (
         <div className="flex w-full h-screen justify-center items-center">
           <Spinner />
@@ -115,13 +164,15 @@ const UserProfile = () => {
               </p>
 
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">Email : </p>
+                <p className="font-semibold text-theme-primary">Email : </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.email || "N/A"}
                 </p>
               </div>
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">Phone Number : </p>
+                <p className="font-semibold text-theme-primary">
+                  Phone Number :{" "}
+                </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.phone || "N/A"}
                 </p>
@@ -133,33 +184,35 @@ const UserProfile = () => {
                 Address
               </p>
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">Country : </p>
+                <p className="font-semibold text-theme-primary">Country : </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.country || "N/A"}
                 </p>
               </div>
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">State : </p>
+                <p className="font-semibold text-theme-primary">State : </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.state || "N/A"}
                 </p>
               </div>
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">City : </p>
+                <p className="font-semibold text-theme-primary">City : </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.city || "N/A"}
                 </p>
               </div>
 
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">Address : </p>
+                <p className="font-semibold text-theme-primary">Address : </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.address || "N/A"}
                 </p>
               </div>
 
               <div className="flex flex-row items-center space-x-2 px-2">
-                <p className="font-semibold">Postal Code : </p>
+                <p className="font-semibold text-theme-primary">
+                  Postal Code :{" "}
+                </p>
                 <p className="text-theme-secondary font-semibold">
                   {userProfileDetails?.getUser[0]?.postalcode || "N/A"}
                 </p>
@@ -168,69 +221,17 @@ const UserProfile = () => {
 
             <section className="text-start mt-6">
               <p className="text-theme-primary text-lg font-semibold mb-4">
-                Friends
+                Friends 
               </p>
 
-              <div className="flex gap-6 px-4 mt-2">
-                <div className="flex flex-col  gap-x-4 mb-4">
-                  <img
-                    src={
-                      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80"
-                    }
-                    className="rounded-md w-16 h-16"
-                  />
-                  <p className="text-theme-primary text-sm font-semibold">
-                    {"John Doe"}
-                  </p>
-                </div>
-
-                <div className="flex flex-col  gap-x-4 mb-4">
-                  <img
-                    src={
-                      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80"
-                    }
-                    className="rounded-md w-16 h-16"
-                  />
-                  <p className="text-theme-primary text-sm font-semibold">
-                    {"John Doe"}
-                  </p>
-                </div>
-
-                <div className="flex flex-col  gap-x-4 mb-4">
-                  <img
-                    src={
-                      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80"
-                    }
-                    className="rounded-md w-16 h-16"
-                  />
-                  <p className="text-theme-primary text-sm font-semibold">
-                    {"John Doe"}
-                  </p>
-                </div>
-
-                <div className="flex flex-col  gap-x-4 mb-4">
-                  <img
-                    src={
-                      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80"
-                    }
-                    className="rounded-md w-16 h-16"
-                  />
-                  <p className="text-theme-primary text-sm font-semibold">
-                    {"John Doe"}
-                  </p>
-                </div>
-
-                <div className="flex flex-col  gap-x-4 mb-4">
-                  <img
-                    src={
-                      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&auto=format&fit=crop&w=50&h=50&q=80"
-                    }
-                    className="rounded-md w-16 h-16"
-                  />
-                  <p className="text-theme-primary text-sm font-semibold">
-                    {"John Doe"}
-                  </p>
-                </div>
+              <div className="flex gap-6 px-4 mt-2 flex-wrap">
+                {userFriendData?.getUserFriendList.values?.map(
+                  (item: any, index: number) => (
+                    <div key={index} className="rounded-full w-24 h-auto border-2 border-theme-primaryBorder p-4">
+                      <p className="text-xs"> {JSON.stringify(item?.friend_user_id)}</p>
+                    </div>
+                  )
+                )}
               </div>
             </section>
 
@@ -238,17 +239,23 @@ const UserProfile = () => {
               <p className="text-theme-primary text-lg font-semibold mb-4">
                 Posts
               </p>
-
+              {userPostError && (
+                <div className="flex w-full justify-center items-center">
+                  <Spinner />
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 w-full">
-                {ALL_POSTS_DATA.map((item, index) => (
-                  <PostComponent
-                    key={item.caption + index}
-                    data={item}
-                    iconsSize={18}
-                    textSize={"sm"}
-                    showIconNames={false}
-                  />
-                ))}
+                {userPostData?.getPostsByUserId?.values.map(
+                  (item: any, index: number) => (
+                    <PostComponent
+                      data={item}
+                      iconsSize={18}
+                      textSize={"sm"}
+                      showIconNames={false}
+                      key={item?.caption + index + 1}
+                    />
+                  )
+                )}
               </div>
             </section>
 
@@ -256,7 +263,9 @@ const UserProfile = () => {
               modelSize="max-w-md"
               buttonText={"Delete"}
               heading={"Delete Profile ?"}
-              buttonStyles={"bg-red-600 hover:bg-red-700 rounded-sm"}
+              buttonFunc={() => deleteUser()}
+              buttonLoading={DeleteLoading}
+              buttonStyles={"!bg-red-600 hover:bg-red-700 rounded-sm"}
               isOpen={showDeleteProfileModal}
               icon={
                 <MdOutlineDeleteForever

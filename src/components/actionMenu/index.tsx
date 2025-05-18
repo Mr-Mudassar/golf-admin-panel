@@ -1,12 +1,13 @@
+import toast from "react-hot-toast";
 import React, { useState } from "react";
 import CustomModal from "../customModal";
 import { useMutation } from "@apollo/client";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { DELETE_POST } from "../../redux/features/queries";
-import toast from "react-hot-toast";
+import { DELTE_USER_POST } from "../../redux/features/queries";
 
 interface DELETE_VERIABLES {
   type: string;
+  userInfo: any;
   postid: string;
   created: string;
   geohash: string;
@@ -22,18 +23,13 @@ const ActionMenu: React.FC<ActionMenuProps> = (props) => {
   const { className, postData } = props;
   const [showDeleteProfileModal, setShowDeleteProfileModal] = useState(false);
 
-  const [deletePost] = useMutation(DELETE_POST, {
+  const [deletePost] = useMutation(DELTE_USER_POST, {
     variables: {
-      type: postData?.type,
-      postid: postData?.postid,
-      geohash: postData?.geohash,
-      userTags: postData?.user_tags,
-      postCreated: postData?.created,
-      groupTags: postData?.group_tags,
+      user_id: postData?.userInfo?.userid,
+      created: postData?.created,
     },
-
     onCompleted: (e) => {
-      e.deletePost
+      e.deleteUserPost
         ? toast.success("Post deleted successfully")
         : toast.error("Failed to delete post");
 

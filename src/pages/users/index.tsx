@@ -1,36 +1,46 @@
-import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router";
-import { UsersData } from "../../data/usersData";
-import DataTable from "../../components/dataTable";
-import { GET_ALL_USER } from "../../redux/features/queries";
+import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
-import LoadingScreen from "../../components/loadingScreen";
+import DataTable from "../../components/dataTable";
+import { useDispatch, useSelector } from "react-redux";
+import { GET_ALL_USER } from "../../redux/features/queries";
+import { setAllUser, setAllUserPage } from "../../redux/features/userSlice";
 
 const Users = () => {
+  const pageSize = 10;  
   const navigate = useNavigate();
-  const [userPage, setUserPage] = useState(1);
-  const [allUserDataArr, setAllUsersDataArr] = useState([]);
+  const dispatch = useDispatch();
+  const allUser = useSelector((state: any) => state.user.allUser);
+  const allUserPage = useSelector((state: any) => state.user.allUserPage);
+
+  // console.log("all user page", allUserPage);
+
   const {
     data: allUsersData,
     loading: allUsersLoading,
     error: allUsersErrors,
-    refetch: nextUsersData,
+    refetch: refetchUsersData,
   } = useQuery(GET_ALL_USER, {
     variables: {
-      page: userPage,
+      page: allUserPage,
     },
+    notifyOnNetworkStatusChange: true,
   });
 
+  const handlePageChange = (page: number) => {
+    console.log("Page number :", page);
+    // if (page !== 1) {
+    //   dispatch(setAllUserPage(page));
+    //   refetchUsersData({ page: page });
+    // } else {
+    //   refetchUsersData({ page: allUserPage });
+    // }
+  };
+
   useEffect(() => {
-    setAllUsersDataArr(allUsersData?.getAllUsers);
+    dispatch(setAllUser(allUsersData?.getAllUsers));
   }, [allUsersData]);
-  console.log(
-    "Respone from users apiiiiiiiiiiiiiiiiiiiiiiiiii",
-    allUsersData,
-    allUsersLoading,
-    allUsersErrors
-  );
 
   const UsersTableHeadings = [
     {
@@ -43,77 +53,55 @@ const Users = () => {
           <img
             src={row.photo_profile}
             className="rounded-full h-10 w-10 object-cover"
+            alt="Profile"
           />
         ),
     },
     {
       name: "Full Name",
       sortable: true,
-      selector: (row: any) => row?.first_name + row?.last_name,
+      selector: (row: any) => `${row?.first_name} ${row?.last_name}`,
     },
     {
-      name: "Email",
+      name: "Email",  
       sortable: true,
-      selector: (row: any) => row.email,
+      selector: (row: any) => row.email || "N/A",
     },
     {
       name: "Country",
       sortable: true,
-      selector: (row: any) => row?.country,
+      selector: (row: any) => row?.country || "N/A",
     },
     {
       name: "State",
       sortable: true,
-      selector: (row: any) => row?.state,
+      selector: (row: any) => row?.state || "N/A",
     },
     {
       name: "City",
       sortable: true,
-      selector: (row: any) => row?.city,
+      selector: (row: any) => row?.city || "N/A",
     },
-    {
-      name: "Joining Date",
-      sortable: true,
-      selector: (row: any) => row.joinDate,
-    },
-
-    // <p className="rounded-full bg-theme-btnBg font-semibold text-sm text-theme-btnColor p-2 px-4 flex w-max">
-    //       Gold
-    //     </p>
-    // {
-    //   name: "Actions",
-    //   sortable: true,
-    //   selector: () => (
-    //     <span className="relative">
-    //       <HiDotsVertical
-    //         size={34}
-    //         onClick={() => setShowActionMenu(!showActionMenu)}
-    //         className="text-theme-primary hover:bg-theme-secondaryBg p-1 cursor-pointer rounded-lg"
-    //       />
-    //       <div>{showActionMenu && <ActionMenu />}</div>
-    //     </span>
-    //   ),
-    // },
   ];
 
   return (
-    <>
+    <div className="p-4">
       <h1 className="text-2xl font-semibold text-theme-btnBgText mb-4 text-left">
         Users
       </h1>
 
       <div className="flex flex-col items-center justify-center">
-        {allUsersLoading && <LoadingScreen />}
-        <div className=" w-full">
+        <div className="w-full">
           <DataTable
+            totalRows={100}
+            allData={allUser}
             pagination={true}
             selectableRows={true}
-            allData={allUserDataArr}
             userCursorPointer={true}
-            // totalRows={UsersData.length}
+            loading={allUsersLoading}
             tableHeadings={UsersTableHeadings}
             onRowClicked={(rowData: any) =>
-              navigate("/userProfile/" + rowData.id, {
+              navigate(`/userProfile/${rowData.userid}`, {
                 state: {
                   profileData: {
                     email: rowData.email,
@@ -122,17 +110,18 @@ const Users = () => {
                 },
               })
             }
-            onChangePage={() => nextUsersData({ page: userPage + 1 })}
-            //   expandableRows,
-            //   isOverflowVisible,
-            //   ExpandedComponent,
-            // onChangeRowsPerPage,
-            //   selectableRowDisabled,
-            //   handleSelectedRowsChange,
+            onChangePage={handlePageChange}
+            paginationPerPage={pageSize}
           />
+
+          {allUsersErrors && (
+            <div className="text-center py-4 text-red-500">
+              Error loading users: {allUsersErrors.message}
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

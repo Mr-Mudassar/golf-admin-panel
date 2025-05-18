@@ -67,8 +67,13 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
           <span
             className="flex gap-2 cursor-pointer"
             onClick={() =>
-              navigate(`/userProfile/${data?.user?.id}`, {
-                state: { profileData: data?.user },
+              navigate(`/userProfile/${data?.userInfo?.userid}`, {
+                state: {
+                  profileData: {
+                    // email: data?.user?.email,
+                    userId: data?.userInfo?.userid,
+                  },
+                },
               })
             }
           >
@@ -101,7 +106,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
           {data?.description}
         </p>
       </div>
-      {data?.has_media && <MediaLoading postId={data.postid} />}
+      {data?.has_media && <MediaLoading postId={data?.postid} />}
       <div className="mt-auto">
         <section className="grid grid-cols-3 border-t border-theme-primaryBorder ">
           {ActionOnPosts.map((item, index) => (
@@ -130,7 +135,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
         heading={"All comments"}
         isOpen={showCommentsModal}
         toggle={toggleCommentsModal}
-        description={<CommentsComponent />}
+        description={<CommentsComponent postId={data?.postid} />}
         modelSize="w-[80%] md:w-[60%] lg:w-[40%]"
       />
     </div>
