@@ -194,6 +194,7 @@ export const GET_COMMENT_BY_POST = gql`
       post_id
       created
       modified
+      parent_id
       comment_id
       reply_count
       userInfo {
@@ -205,3 +206,55 @@ export const GET_COMMENT_BY_POST = gql`
     }
   }
 `;
+
+export const UPDATE_COMMENT = gql`
+  mutation UpdateComment($input: UpdateCommentInput!) {
+    updateComment(UpdateCommentInput: $input) {
+      created
+    }
+  }
+`;
+
+export const DELETE_COMMENT = gql`
+  mutation DeleteComment(
+    $post_id: String!
+    $comment_id: String
+    $CommentCreated: String!
+    $postUserId: String!
+    $postCreated: String!
+    $community_id: String
+  ) {
+    deleteComment(
+      postId: $post_id
+      postUserId: $postUserId
+      comment_id: $comment_id
+      postCreated: $postCreated
+      community_id: $community_id
+      CommentCreated: $CommentCreated
+    )
+  }
+`;
+
+export const UPDATE_USER_PROFILE = gql`
+  mutation UpdateUserProfile($updatedData: CassandraUpdateUserInput!) {
+    updateUser(CassandraUpdateUserInput: $updatedData) {
+      last_name
+    }
+  }
+`;
+
+//  $first_name: String
+//      $last_name: String
+//       $email: String
+//       $postalcode: Float
+//       $address: String
+//       $bio: String
+//       $city: String
+//       $country: String
+//       $type: String
+//       $state: String
+//       $username: String
+//       $phone: String
+//       $status: String
+//       $hobbies: [String!]
+//       $gender: String

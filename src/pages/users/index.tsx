@@ -8,7 +8,7 @@ import { GET_ALL_USER } from "../../redux/features/queries";
 import { setAllUser, setAllUserPage } from "../../redux/features/userSlice";
 
 const Users = () => {
-  const pageSize = 10;  
+  const pageSize = 10;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const allUser = useSelector((state: any) => state.user.allUser);
@@ -30,12 +30,12 @@ const Users = () => {
 
   const handlePageChange = (page: number) => {
     console.log("Page number :", page);
-    // if (page !== 1) {
-    //   dispatch(setAllUserPage(page));
-    //   refetchUsersData({ page: page });
-    // } else {
-    //   refetchUsersData({ page: allUserPage });
-    // }
+    if (page !== 1) {
+      dispatch(setAllUserPage(page));
+      refetchUsersData({ page: page });
+    } else {
+      refetchUsersData({ page: allUserPage });
+    }
   };
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const Users = () => {
       selector: (row: any) => `${row?.first_name} ${row?.last_name}`,
     },
     {
-      name: "Email",  
+      name: "Email",
       sortable: true,
       selector: (row: any) => row.email || "N/A",
     },
@@ -110,8 +110,12 @@ const Users = () => {
                 },
               })
             }
-            onChangePage={handlePageChange}
+            onChangePage={(e) => handlePageChange(e)}
             paginationPerPage={pageSize}
+            handlePreviousPageClick={() => {
+              dispatch(setAllUserPage(allUserPage - 1));
+              refetchUsersData({ page: allUserPage - 1 });
+            }}
           />
 
           {allUsersErrors && (

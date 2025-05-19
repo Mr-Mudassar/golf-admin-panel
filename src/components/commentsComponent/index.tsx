@@ -1,57 +1,91 @@
-import { useState } from "react";
+import {
+  DELETE_COMMENT,
+  UPDATE_COMMENT,
+  GET_COMMENT_BY_POST,
+} from "../../redux/features/queries";
+import Spinner from "../spinner";
 import toast from "react-hot-toast";
 import CustomBtn from "../customBtn";
 import { Form, Formik } from "formik";
 import { TbEdit } from "react-icons/tb";
 import CustomModal from "../customModal";
 import { RxCross2 } from "react-icons/rx";
-import { useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
 import CustomInputField from "../customInputField";
-import { CommentsData } from "../../data/commentsData";
+import { useMutation, useQuery } from "@apollo/client";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { GET_COMMENT_BY_POST } from "../../redux/features/queries";
 import { EDIT_COMMENT_INITIAL_VALUES } from "../../validations/initialValues";
 import { EDIT_COMMENT_VALIDATION_SCHEMA } from "../../validations/validationSchema";
 
 interface CommentsComponentProps {
-  postId: string;
+  postData: any;
 }
 
 const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
-  const { postId } = props;
-
+  const { postData } = props;
+  const [postComments, setPostComments] = useState([]);
+  const [deleteableCommentId, setDeleteableCommentId] = useState<any>();
+  const [showDeleteProfileModal, setShowDeleteProfileModal] = useState(false);
   const [editableCommentId, setEditableCommentId] = useState<number | null>(
     null
   );
-  const [showDeleteProfileModal, setShowDeleteProfileModal] = useState(false);
+
+  console.log("delted comment id", deleteableCommentId);
 
   const {
     data: postCommentData,
     loading: postCommentLoading,
     error: postCommentError,
+    refetch: refetchPostComment,
   } = useQuery(GET_COMMENT_BY_POST, {
     variables: {
       page: 1,
-      postId: postId,
+      postId: postData?.postid,
     },
   });
 
-  console.log(
-    "Post comments data",
-    postCommentData,
-    postCommentLoading,
-    postCommentError
-  );
+  useEffect(() => {
+    setPostComments(postCommentData?.getCommentByPost);
+  }, [postCommentData]);
 
-  const handleCommentUpdate = (values: typeof EDIT_COMMENT_INITIAL_VALUES) => {
-    console.log("Updated Comment: ", values);
-    toast.success("Comment updated successfully!");
-    setEditableCommentId(null);
+  const [udaptedComment, { loading: updateCommentLoading }] =
+    useMutation(UPDATE_COMMENT);
+
+  const handleCommentUpdate = (values: any) => {
+    udaptedComment({
+      variables: {
+        input: {
+          ...values,
+        },
+      },
+      onCompleted: () => {
+        refetchPostComment();
+        toast.success("Comment updated successfully!");
+        setEditableCommentId(null);
+      },
+      onError: () => {
+        toast.error("Error updating comment");
+        setEditableCommentId(null);
+      },
+    });
   };
+
+  const [deleteComment, { loading: deleteCommentLoading }] =
+    useMutation(DELETE_COMMENT);
 
   return (
     <div>
-      {postCommentData?.getCommentByPost?.map((item: any, index: number) => (
+      {postCommentLoading && (
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      )}
+      {postCommentError && (
+        <div className="flex justify-center items-center p-8">
+          <p className="text-red-600">Failed to load comments</p>
+        </div>
+      )}
+      {postComments?.map((item: any, index: number) => (
         <div
           key={index + item?.comment_id}
           className="flex flex-col sm:flex-row gap-2 mb-4 w-full items-center"
@@ -61,15 +95,15 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
             alt={item?.userInfo?.photo_profile}
             className="rounded-full w-12 h-12"
           />
-          <div>
-            <div className="bg-theme-secondaryBg rounded-lg p-3 ml-4 w-full">
+          <div className="w-full">
+            <div className="bg-theme-secondaryBg rounded-lg p-3 ml-4">
               <div className="flex justify-between items-center">
                 <p className="text-theme-primary text-md font-semibold">
                   {item?.userInfo?.first_name + " " + item?.userInfo?.last_name}
                 </p>
 
                 <span className="flex gap-2 cursor-pointer">
-                  {editableCommentId === item.id ? (
+                  {editableCommentId === item?.comment_id ? (
                     <RxCross2
                       size={32}
                       onClick={() => setEditableCommentId(null)}
@@ -79,30 +113,50 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
                     <>
                       <TbEdit
                         size={20}
-                        onClick={() => setEditableCommentId(item.id)}
+                        onClick={() => setEditableCommentId(item.comment_id)}
                         className="text-theme-btnBgText"
                       />
                       <MdOutlineDeleteForever
                         size={22}
-                        onClick={() => setShowDeleteProfileModal(true)}
+                        onClick={() => {
+                          setDeleteableCommentId(item);
+                          setShowDeleteProfileModal(true);
+                        }}
                         className="text-red-600 cursor-pointer"
                       />
                     </>
                   )}
                 </span>
               </div>
-              {editableCommentId === item.id ? (
+              {editableCommentId === item.comment_id ? (
                 <Formik
-                  initialValues={EDIT_COMMENT_INITIAL_VALUES}
-                  onSubmit={(values) => handleCommentUpdate(values)}
+                  initialValues={{
+                    ...EDIT_COMMENT_INITIAL_VALUES,
+                    comment: item?.comment,
+                  }}
+                  onSubmit={(values) =>
+                    handleCommentUpdate({
+                      ...values,
+                      type: item?.type,
+                      likes: item.likes,
+                      status: item?.status,
+                      post_id: item?.post_id,
+                      created: item?.created,
+                      modified: item?.modified,
+                      parent_id: item?.parent_id,
+                      comment_id: item?.comment_id,
+                      reply_count: item?.reply_count,
+                    })
+                  }
                   validationSchema={EDIT_COMMENT_VALIDATION_SCHEMA}
                 >
                   {({
-                    errors,
-                    touched,
+                    values,
+                    // errors,
+                    // touched,
                     handleBlur,
                     handleSubmit,
-                    setFieldValue,
+                    handleChange,
                   }) => (
                     <Form onSubmit={handleSubmit}>
                       <CustomInputField
@@ -110,22 +164,20 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
                         cols={100}
                         name={"comment"}
                         type={"textarea"}
-                        value={item?.comment}
+                        value={values?.comment}
                         onBlurHandle={handleBlur}
-                        disabled={editableCommentId !== item.id}
-                        onChangeHandle={(e) => {
-                          console.log("Valuesssssssss", e.target.value);
-                          setFieldValue("comment", e.target.value);
-                        }}
-                        error={
-                          errors.comment && touched.comment
-                            ? errors.comment
-                            : ""
-                        }
+                        onChangeHandle={handleChange}
+                        disabled={editableCommentId !== item.comment_id}
+                        // error={
+                        //   errors.comment && touched.comment
+                        //     ? errors.comment
+                        //     : ""
+                        // }
                       />
                       <CustomBtn
                         type={"submit"}
                         text={"Update"}
+                        isLoading={updateCommentLoading}
                         className="font-normal text-sm px-2 rounded-sm"
                       />
                     </Form>
@@ -138,10 +190,10 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
             <div className="ml-4 flex justify-around text-xs text-theme-secondary font-semibold">
               <p>{"2 days ago"}</p>
               <button onClick={() => window.alert("Like")}>
-                Like({item?.likes?.length})
+                Like({item?.likes?.length || 0})
               </button>
               <button onClick={() => window.alert("Reply")}>
-                Reply({item?.reply_count})
+                Reply({item?.reply_count || 0})
               </button>
             </div>
           </div>
@@ -151,9 +203,29 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
       <CustomModal
         modelSize="max-w-md"
         buttonText={"Delete"}
+        buttonFunc={async () =>
+          await deleteComment({
+            variables: {
+              postCreated: postData?.created,
+              post_id: deleteableCommentId?.post_id,
+              postUserId: postData?.userInfo?.userid,
+              comment_id: deleteableCommentId?.comment_id,
+              CommentCreated: deleteableCommentId?.created,
+            },
+            onCompleted: () => {
+              refetchPostComment();
+              setShowDeleteProfileModal(false);
+              toast.success("Comment deleted successfully!");
+            },
+            onError: () => {
+              toast.error("Failed to delete comment");
+            },
+          })
+        }
         heading={"Delete Comment ?"}
-        buttonStyles={"bg-red-600 hover:bg-red-700 rounded-sm"}
         isOpen={showDeleteProfileModal}
+        buttonLoading={deleteCommentLoading}
+        buttonStyles={"!bg-red-600 hover:bg-red-700 rounded-sm"}
         icon={
           <MdOutlineDeleteForever
             size={60}

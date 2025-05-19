@@ -8,3 +8,21 @@ const generalValidation = Yup.string()
 export const EDIT_COMMENT_VALIDATION_SCHEMA = Yup.object().shape({
   comment: generalValidation,
 });
+
+export const UPDATE_PROFILE_VALIDATION_SCHEMA = Yup.object().shape({
+  first_name: generalValidation,
+  last_name: generalValidation,
+  email: generalValidation,
+  postalcode: generalValidation,
+  address: generalValidation,
+  bio: generalValidation,
+  city: generalValidation,
+  country: generalValidation,
+  type: generalValidation,
+  state: generalValidation,
+  username: generalValidation,
+  phone: generalValidation,
+  status: generalValidation,
+  // hobbies: generalValidation,
+  gender: generalValidation,
+});

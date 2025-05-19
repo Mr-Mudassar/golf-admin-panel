@@ -16,11 +16,12 @@ interface DELETE_VERIABLES {
 }
 interface ActionMenuProps {
   className?: string;
+  refetch: () => void;
   postData?: DELETE_VERIABLES;
 }
 
 const ActionMenu: React.FC<ActionMenuProps> = (props) => {
-  const { className, postData } = props;
+  const { className, postData, refetch } = props;
   const [showDeleteProfileModal, setShowDeleteProfileModal] = useState(false);
 
   const [deletePost] = useMutation(DELTE_USER_POST, {
@@ -70,6 +71,7 @@ const ActionMenu: React.FC<ActionMenuProps> = (props) => {
         buttonText={"Delete"}
         buttonFunc={async () => {
           await deletePost();
+          refetch();
         }}
         heading={"Delete Profile ?"}
         buttonStyles={"!bg-red-600 hover:bg-red-700 rounded-sm"}

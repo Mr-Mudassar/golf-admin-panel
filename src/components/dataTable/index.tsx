@@ -3,6 +3,8 @@ import DataTable, {
   type TableColumn as DataTableColumn,
 } from "react-data-table-component";
 import { useSelector } from "react-redux";
+import CustomBtn from "../customBtn";
+import { IoMdArrowBack } from "react-icons/io";
 
 export interface TableColumn<T> {
   name: string;
@@ -26,6 +28,7 @@ export interface DataTableComponentProps<T> {
   selectableRowDisabled?: (row: T) => boolean;
   onChangePage?: (page: number, totalRows: number) => void;
   onRowClicked?: (row: T, event: React.MouseEvent) => void;
+  handlePreviousPageClick?: () => void;
   handleSelectedRowsChange?: (selected: {
     selectedRows: string[] | T[];
   }) => void;
@@ -50,8 +53,9 @@ const DataTableComponent = <T,>({
   pagination = false,
   onChangeRowsPerPage,
   selectableRowDisabled,
-  userCursorPointer = false,
+  handlePreviousPageClick,
   handleSelectedRowsChange,
+  userCursorPointer = false,
 }: DataTableComponentProps<T>) => {
   const AppMode = useSelector((state: any) => state.user.appMode);
 
@@ -126,7 +130,18 @@ const DataTableComponent = <T,>({
         persistTableHead
         progressPending={loading}
         noDataComponent={
-          <div className="text-theme-primary p-4">No records found</div>
+          <div className="py-8">
+            <div className="text-theme-primary py-4 text-center">
+              No records found
+            </div>
+            <CustomBtn
+              type="button"
+              text={"Previous Page"}
+              handleOnClick={handlePreviousPageClick}
+              className=" font-normal text-sm rounded-sm"
+              icon={<IoMdArrowBack size={20} className="mr-2" />}
+            />
+          </div>
         }
         paginationComponentOptions={{
           noRowsPerPage: true,

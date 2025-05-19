@@ -40,7 +40,7 @@ const FillBtn: React.FC<CustomBtnProps> = (props) => {
           </span>
         </>
       ) : (
-        <Spinner size="h-8 w-8" />
+        <Spinner size="h-8 w-8 !ng-white" />
       )}
     </button>
   );

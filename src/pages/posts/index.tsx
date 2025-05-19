@@ -33,7 +33,7 @@ const Posts = () => {
       const newPosts = allPostData.getAllUserPost.values.filter(
         (newPost: any) =>
           !posts.some(
-            (existingPost: any) => existingPost.postid === newPost.postid
+            (existingPost: any) => existingPost?.postid === newPost?.postid
           )
       );
       dispatch(setPosts([...posts, ...newPosts]));
@@ -79,6 +79,7 @@ const Posts = () => {
               iconsSize={18}
               textSize={"sm"}
               showIconNames={false}
+              refetch={() => {}}
             />
           ))}
         </div>

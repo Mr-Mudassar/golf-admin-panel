@@ -31,7 +31,7 @@ const Model: React.FC<ModelProps> = ({
   cancelBtn = false,
   modelSize = "w-lg",
   rounded = "rounded-xl",
-  buttonLoading = true,
+  buttonLoading = false,
 }) => {
   useEffect(() => {
     if (isOpen) {

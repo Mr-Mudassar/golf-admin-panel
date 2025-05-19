@@ -57,12 +57,12 @@ const CustomInputField: React.FC<InputFieldProps> = (props) => {
   };
 
   return (
-    <div className={`mt-1 w-full ${mainClass}`}>
+    <div className={`w-full ${mainClass}`}>
       <label
         htmlFor="input"
-        className="text-sm flex gap-x-1 text-theme-secondary ml-2"
+        className="text-sm flex text-theme-secondary font-semibold"
       >
-        {label.toUpperCase()}
+        {label}
       </label>
 
       <div className="relative">
@@ -78,7 +78,7 @@ const CustomInputField: React.FC<InputFieldProps> = (props) => {
             placeholder={placeholder}
             onBlur={(e) => onBlurHandle?.(e)}
             onChange={(e) => onChangeHandle?.(e)}
-            className={`mt-1 rounded-sm w-full p-1 border border-theme-secondaryBg transition-all hover:ring-theme-primary hover:ring-opacity-30 focus:outline-none focus:border-theme-primary focus:ring-theme-primary focus:ring-1 focus:ring-opacity-30 focus-visible:outline-none focus-visible:border-theme-primary focus-visible:ring-opacity-30 ${className}`}
+            className={`mt-1 rounded-sm w-full p-1 border border-theme-secondaryBg transition-all ${className}`}
           />
         ) : (
           <input
@@ -101,7 +101,7 @@ const CustomInputField: React.FC<InputFieldProps> = (props) => {
             onKeyDown={(e) => handleKeyPress?.(e)}
             min={type === "number" ? 0 : ""}
             step={type === "number" ? "any" : ""}
-            className={`mt-1 rounded-sm w-full py-1 border border-theme-secondaryBg transition-all hover:ring-theme-primary hover:ring-opacity-30 focus:outline-none focus:border-theme-primary focus:ring-theme-primary focus:ring-1 focus:ring-opacity-30 focus-visible:outline-none focus-visible:border-theme-primary focus-visible:ring-opacity-30 
+            className={`mt-1 rounded-sm w-full py-2 border border-theme-primaryBorder transition-all
             ${iconPosition === "left" ? "ps-10" : "px-3"}
             ${type === "password" ? "pr-14" : ""} ${className} ${
               type === "number" ? "appearance-none" : ""

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ActionMenu from "../actionMenu";
+import { GoHeart } from "react-icons/go";
 import CustomModal from "../customModal";
 import MediaLoading from "../mediaLoading";
 import { useNavigate } from "react-router";
@@ -7,35 +8,35 @@ import { VscComment } from "react-icons/vsc";
 import { IoMdShareAlt } from "react-icons/io";
 import { HiDotsVertical } from "react-icons/hi";
 import CommentsComponent from "../commentsComponent";
-import { GoHeart, GoHeartFill } from "react-icons/go";
 
 interface PostComponentProps {
   data: any;
   textSize?: string;
-  showIconNames?: boolean;
   iconsSize?: number;
+  refetch: () => void;
+  showIconNames?: boolean;
 }
 
 const PostComponent: React.FC<PostComponentProps> = (props) => {
   const navigate = useNavigate();
-  const [likedPost, setLikedPost] = useState(false);
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const toggleCommentsModal = () => setShowCommentsModal(!showCommentsModal);
-  const { data, iconsSize = 22, textSize = "sm", showIconNames = true } = props;
+  const {
+    data,
+    refetch,
+    iconsSize = 22,
+    textSize = "sm",
+    showIconNames = true,
+  } = props;
 
   const ActionOnPosts = [
     {
       name: "Like",
-      icon: likedPost ? (
-        <GoHeartFill size={iconsSize} className="text-theme-primary" />
-      ) : (
-        <GoHeart size={iconsSize} className="text-theme-secondary" />
-      ),
+      icon: <GoHeart size={iconsSize} className="text-theme-secondary" />,
       cout: data?.like_Count,
       border: true,
       action: () => {
-        setLikedPost(!likedPost);
         console.log("Like action");
       },
     },
@@ -98,7 +99,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
               onClick={() => setShowActionMenu(!showActionMenu)}
               className="text-theme-primary hover:bg-theme-secondaryBg p-1 cursor-pointer rounded-lg"
             />
-            {showActionMenu && <ActionMenu postData={data} />}
+            {showActionMenu && <ActionMenu postData={data} refetch={refetch} />}
           </div>
         </div>
 
@@ -119,7 +120,9 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
             >
               <span className="flex justify-center items-center">
                 {item.icon}
-                <p className="text-sm text-theme-secondary">({item.cout})</p>
+                <p className="text-sm text-theme-secondary">
+                  ({item?.cout || 0})
+                </p>
               </span>
               {showIconNames && (
                 <p className={`text-${textSize} text-theme-secondary`}>
@@ -135,7 +138,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
         heading={"All comments"}
         isOpen={showCommentsModal}
         toggle={toggleCommentsModal}
-        description={<CommentsComponent postId={data?.postid} />}
+        description={<CommentsComponent postData={data} />}
         modelSize="w-[80%] md:w-[60%] lg:w-[40%]"
       />
     </div>

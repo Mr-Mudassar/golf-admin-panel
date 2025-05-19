@@ -1,25 +1,34 @@
 import {
   DELETE_USER,
   GET_USER_PROFILE,
-  GET_ALL_POST_OF_SINGLE_USER,
   GET_USER_FRIEND_LIST,
+  GET_ALL_POST_OF_SINGLE_USER,
 } from "../../redux/features/queries";
+import toast from "react-hot-toast";
+import { Formik, Form } from "formik";
 import { TbEdit } from "react-icons/tb";
 import { useEffect, useState } from "react";
 import Spinner from "../../components/spinner";
-import { ALL_POSTS_DATA } from "../../data/posts";
+import CustomBtn from "../../components/customBtn";
 import CustomModal from "../../components/customModal";
 import { useMutation, useQuery } from "@apollo/client";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import PostComponent from "../../components/postComponent";
 import { useLocation, useNavigate, useParams } from "react-router";
-import toast from "react-hot-toast";
+import CustomInputField from "../../components/customInputField";
+import { UPDATE_PROFILE_INITIAL_VALUES } from "../../validations/initialValues";
+import { UPDATE_PROFILE_VALIDATION_SCHEMA } from "../../validations/validationSchema";
+import { GrUpdate } from "react-icons/gr";
+import { FiSend } from "react-icons/fi";
 
 const UserProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const userId = useParams().userId;
+  const [postPage, setPostPage] = useState(1);
   const ProfileData = location?.state?.profileData;
+  const [allPostData, setAllPostsData] = useState<any[]>([]);
+  const [showUpdateProfileModal, setShowUpdateProfileModal] = useState(false);
   const [showDeleteProfileModal, setShowDeleteProfileModal] = useState(false);
 
   useEffect(() => {
@@ -49,24 +58,41 @@ const UserProfile = () => {
     },
   });
 
-  // console.log(
-  //   "Response from user friend apiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
-  //   userFriendData?.getUserFriendList.values,
-  //   userFriendError,
-  //   userFriendLoading
-  // );
-
   // user post get api call
   const {
     data: userPostData,
     loading: userPostLoading,
     error: userPostError,
+    refetch: loadMorePosts,
   } = useQuery(GET_ALL_POST_OF_SINGLE_USER, {
     variables: {
       userId: userProfileDetails?.getUser[0]?.userid,
       page: 1,
     },
   });
+
+  const handleLoadMorePosts = (postPage: number) => {
+    if (postPage === 1) {
+      setAllPostsData(userPostData?.getPostsByUserId?.values);
+    } else {
+      loadMorePosts({ page: postPage });
+      setAllPostsData((prev) => {
+        const newPosts = userPostData?.getPostsByUserId?.values || [];
+        const filteredPosts = newPosts.filter(
+          (newPost: any) =>
+            !prev.some(
+              (existingPost: any) => existingPost.postid === newPost.postid
+            )
+        );
+        return [...prev, ...filteredPosts];
+      });
+      setPostPage(postPage);
+    }
+  };
+
+  useEffect(() => {
+    handleLoadMorePosts(postPage);
+  }, [userPostData]);
 
   // delete User api call
   const [deleteUser, { loading: DeleteLoading }] = useMutation(DELETE_USER, {
@@ -83,6 +109,10 @@ const UserProfile = () => {
       toast.error("Error Deleting User"), setShowDeleteProfileModal(false);
     },
   });
+
+  const handleUpdateProfileFunc = (values: any) => {
+    console.log("Values on update profile func", values);
+  };
 
   return (
     <>
@@ -105,6 +135,7 @@ const UserProfile = () => {
             <span className="flex gap-2">
               <TbEdit
                 size={38}
+                onClick={() => setShowUpdateProfileModal(true)}
                 className="text-theme-btnColor bg-theme-btnBg hover:bg-theme-btnColorHover p-1 rounded-sm cursor-pointer"
               />
               <MdOutlineDeleteForever
@@ -221,14 +252,32 @@ const UserProfile = () => {
 
             <section className="text-start mt-6">
               <p className="text-theme-primary text-lg font-semibold mb-4">
-                Friends 
+                Friends
               </p>
 
               <div className="flex gap-6 px-4 mt-2 flex-wrap">
+                {userFriendLoading && (
+                  <div className="flex w-full justify-center items-center">
+                    <Spinner />
+                  </div>
+                )}
+
+                {userFriendError && (
+                  <div className="flex justify-center items-center py-6">
+                    <p className="text-red-600 text-lg">Failed to load posts</p>
+                  </div>
+                )}
+
                 {userFriendData?.getUserFriendList.values?.map(
                   (item: any, index: number) => (
-                    <div key={index} className="rounded-full w-24 h-auto border-2 border-theme-primaryBorder p-4">
-                      <p className="text-xs"> {JSON.stringify(item?.friend_user_id)}</p>
+                    <div
+                      key={index}
+                      className="rounded-full w-24 h-auto border-2 border-theme-primaryBorder p-4"
+                    >
+                      <p className="text-xs">
+                        {" "}
+                        {JSON.stringify(item?.friend_user_id)}
+                      </p>
                     </div>
                   )
                 )}
@@ -239,24 +288,54 @@ const UserProfile = () => {
               <p className="text-theme-primary text-lg font-semibold mb-4">
                 Posts
               </p>
-              {userPostError && (
+              {userPostLoading && (
                 <div className="flex w-full justify-center items-center">
                   <Spinner />
                 </div>
               )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 w-full">
-                {userPostData?.getPostsByUserId?.values.map(
-                  (item: any, index: number) => (
-                    <PostComponent
-                      data={item}
-                      iconsSize={18}
-                      textSize={"sm"}
-                      showIconNames={false}
-                      key={item?.caption + index + 1}
-                    />
-                  )
-                )}
+                {allPostData?.map((item: any, index: number) => (
+                  <PostComponent
+                    data={item}
+                    iconsSize={18}
+                    textSize={"sm"}
+                    showIconNames={false}
+                    key={item?.caption + index + 1}
+                    refetch={() => {
+                      setPostPage(1);
+                      loadMorePosts({ page: 1 });
+                    }}
+                  />
+                ))}
               </div>
+
+              {userPostError && (
+                <div className="flex justify-center items-center py-6">
+                  <p className="text-red-600 text-lg">Failed to load posts</p>
+                </div>
+              )}
+
+              {!userPostError &&
+              userPostData?.getPostsByUserId?.values.length === 10 ? (
+                <div className="flex justify-center">
+                  <CustomBtn
+                    type="button"
+                    text="Load more"
+                    isLoading={userPostLoading}
+                    handleOnClick={() => {
+                      handleLoadMorePosts(postPage + 1);
+                    }}
+                    className="text-sm !font-normal rounded-sm m-6"
+                  />
+                </div>
+              ) : (
+                <div className="flex justify-center items-center py-8">
+                  <p className="text-theme-secondary">
+                    No more posts by this user
+                  </p>
+                </div>
+              )}
             </section>
 
             <CustomModal
@@ -279,6 +358,191 @@ const UserProfile = () => {
                   Are you sure you want to delete this post? This action cannot
                   be undone.
                 </p>
+              }
+            />
+
+            <CustomModal
+              isOpen={showUpdateProfileModal}
+              modelSize="w-full md:w-[60%]"
+              heading={"Update User Profile"}
+              icon={
+                <GrUpdate
+                  size={60}
+                  className="bg-theme-btnBg rounded-full text-theme-btnColor p-2"
+                />
+              }
+              toggle={() => setShowUpdateProfileModal(!showUpdateProfileModal)}
+              description={
+                <div className="border-2 border-theme-primaryBorder rounded-lg p-4">
+                  <Formik
+                    initialValues={{
+                      ...UPDATE_PROFILE_INITIAL_VALUES,
+                      ...userProfileDetails.getUser[0],
+                    }}
+                    validationSchema={UPDATE_PROFILE_VALIDATION_SCHEMA}
+                    onSubmit={(values) => handleUpdateProfileFunc(values)}
+                  >
+                    {({
+                      values,
+                      errors,
+                      touched,
+                      handleBlur,
+                      handleSubmit,
+                      handleChange,
+                    }) => (
+                      <Form
+                        onSubmit={handleSubmit}
+                        className="grid grid-cols-2 gap-4"
+                      >
+                        {console.log(errors)}
+                        <CustomInputField
+                          type="text"
+                          name="first_name"
+                          label="First Name"
+                          value={values.first_name}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.first_name && touched.first_name
+                              ? errors.first_name
+                              : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="last_name"
+                          label="Last Name"
+                          value={values.last_name}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.last_name && touched.last_name
+                              ? errors.last_name
+                              : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="email"
+                          label="Email"
+                          value={values.email}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.email && touched.email ? errors.email : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="phone"
+                          label="Phone Number"
+                          value={values.phone}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.phone && touched.phone ? errors.phone : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="country"
+                          label="Country"
+                          value={values.country}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.country && touched.country
+                              ? errors.country
+                              : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="state"
+                          label="State"
+                          value={values.state}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.state && touched.state ? errors.state : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="city"
+                          label="City"
+                          value={values.city}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={errors.city && touched.city ? errors.city : ""}
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="address"
+                          label="Address"
+                          value={values.address}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.address && touched.address
+                              ? errors.address
+                              : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="postalcode"
+                          label="Postal Code"
+                          value={values.postalcode}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.postalcode && touched.postalcode
+                              ? errors.postalcode
+                              : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="status"
+                          label="Status"
+                          value={values?.status}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={
+                            errors.status && touched.status ? errors.status : ""
+                          }
+                        />
+
+                        <CustomInputField
+                          type="text"
+                          name="type"
+                          label="Type"
+                          value={values?.type}
+                          onBlurHandle={handleBlur}
+                          onChangeHandle={handleChange}
+                          error={errors.type && touched.type ? errors.type : ""}
+                        />
+
+                        <CustomBtn
+                          type="submit"
+                          text="SUBMIT"
+                          icon={<FiSend size={18} className="mr-2" />}
+                          className="flex justify-center w-full !h-9.5 rounded-sm mt-6"
+                        />
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
               }
             />
           </div>
