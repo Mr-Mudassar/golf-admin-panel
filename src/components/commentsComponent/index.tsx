@@ -157,11 +157,10 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
   const UpdateCommentReplyFromLocal = (comment: any) => {
     setCommentReplyDataArr((prev: any[]) =>
       prev?.map((item: any) =>
-        item.comment_id === editableCommentId ? { ...comment } : item
+        item.comment_id === editableCommentId ? { ...item, ...comment } : item
       )
     );
   };
-
 
   return (
     <div>
