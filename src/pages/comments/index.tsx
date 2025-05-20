@@ -1,4 +1,4 @@
-import CommentsComponent from "../../components/commentsComponent";
+// import CommentsComponent from "../../components/commentsComponent";
 
 const Comments = () => {
   return (
@@ -8,7 +8,7 @@ const Comments = () => {
       </h1>
       <div className="flex flex-col items-center justify-center">
         <div className="border border-theme-primaryBorder rounded-xl mb-4 p-4 bg-theme-primaryBg max-w-3xl w-full">
-          <CommentsComponent />
+          {/* <CommentsComponent /> */}
         </div>
       </div>
     </>
