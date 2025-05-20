@@ -1,16 +1,15 @@
 import {
-  MdOutlineGolfCourse,
-  MdKeyboardDoubleArrowRight,
+  MdOutlineManageHistory,
+  MdKeyboardDoubleArrowLeft,
 } from "react-icons/md";
 import { useEffect } from "react";
-import { CgProfile } from "react-icons/cg";
-import { ImHistory } from "react-icons/im";
 import { LiaComments } from "react-icons/lia";
 import { PiUsersThree } from "react-icons/pi";
 import { AiOutlinePicture } from "react-icons/ai";
+import GolfGuidersLogo from "../../assets/logo.png";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
+import { MdKeyboardDoubleArrowRight } from "react-icons/md";
 import { setIsSidebarOpen } from "../../redux/features/userSlice";
 
 const Sidebar = () => {
@@ -58,13 +57,15 @@ const Sidebar = () => {
     {
       name: "User Activities",
       path: "/userActivities",
-      icon: <ImHistory size={24} className=" text-center my-auto" />,
+      icon: (
+        <MdOutlineManageHistory size={24} className=" text-center my-auto" />
+      ),
     },
-    {
-      name: "Profile",
-      path: "/profile",
-      icon: <CgProfile size={22} className=" text-center my-auto" />,
-    },
+    // {
+    //   name: "Profile",
+    //   path: "/profile",
+    //   icon: <CgProfile size={22} className=" text-center my-auto" />,
+    // },
   ];
 
   return (
@@ -77,12 +78,15 @@ const Sidebar = () => {
       <div className="py-2 my-2 flex justify-around items-center">
         {isSidebarOpen && (
           <>
-            <MdOutlineGolfCourse
-              size={34}
-              className="bg-theme-btnBg my-auto text-white p-1 rounded"
+            <img
+              src={GolfGuidersLogo}
+              alt="golfguiders logo"
+              className="w-10 h-10"
             />
 
-            <h1 className="text-theme-primary font-bold text-xl">Golfguider</h1>
+            <h1 className="text-theme-primary font-bold text-xl">
+              GolfGuiders
+            </h1>
           </>
         )}
 
@@ -135,7 +139,7 @@ const Sidebar = () => {
               to={"https://google.com"}
               className="text-md font-semibold mx-2 text-theme-btnBgText"
             >
-              Golfguider
+              GolfGuiders
             </Link>
           </div>
         </div>

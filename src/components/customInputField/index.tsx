@@ -7,11 +7,11 @@ interface InputFieldProps {
   value: string;
   cols?: number;
   label?: string;
-  rows?: number;
   error?: string;
   disabled?: boolean;
   mainClass?: string;
   className?: string;
+  rows?: number | any;
   placeholder?: string;
   iconPosition?: string;
   icon?: React.ReactNode;
@@ -95,17 +95,20 @@ const CustomInputField: React.FC<InputFieldProps> = (props) => {
             value={value}
             disabled={disabled}
             placeholder={placeholder}
+            min={type === "number" ? 0 : ""}
             onBlur={(e) => onBlurHandle?.(e)}
             autoComplete={autoComplete as string}
             onChange={(e) => onChangeHandle?.(e)}
             onKeyDown={(e) => handleKeyPress?.(e)}
-            min={type === "number" ? 0 : ""}
             step={type === "number" ? "any" : ""}
-            className={`mt-1 rounded-sm w-full py-2 border border-theme-primaryBorder transition-all
+            className={`mt-1 rounded-sm w-full py-2 border transition-all
+            bg-theme-primaryBg text-theme-primary
+            focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20
+            placeholder:text-theme-secondary placeholder:opacity-70 
             ${iconPosition === "left" ? "ps-10" : "px-3"}
-            ${type === "password" ? "pr-14" : ""} ${className} ${
-              type === "number" ? "appearance-none" : ""
-            }`}
+            ${type === "password" ? "pr-14" : ""} 
+            ${className} 
+            ${type === "number" ? "appearance-none" : ""}`}
           />
         )}
 
@@ -137,4 +140,4 @@ const CustomInputField: React.FC<InputFieldProps> = (props) => {
   );
 };
 
-export default memo(CustomInputField);  
+export default memo(CustomInputField);

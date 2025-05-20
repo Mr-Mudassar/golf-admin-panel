@@ -16,6 +16,7 @@ export const GET_ALL_USER_POST = gql`
       }
       type
       title
+      user_id
       postid
       created
       geohash
@@ -28,33 +29,6 @@ export const GET_ALL_USER_POST = gql`
     }
   }
 `;
-
-//  values {
-//       userInfo {
-//         type
-//         city
-//         state
-//         userid
-//         country
-//         last_name
-//         fcm_token
-//         first_name
-//         photo_profile
-//       }
-//       type
-//       title
-//       postid
-//       created
-//       geohash
-//       has_media
-//       user_tags
-//       group_tags
-//       like_Count
-//       share_Count
-//       postal_code
-//       description
-//       comment_count
-//     }
 
 export const GET_POST_MEDIA_BY_POSTID = gql`
   query getPostMediaById($postId: String!) {
@@ -167,22 +141,16 @@ export const GET_USER_FRIEND_LIST = gql`
         user_id
         created
         friend_user_id
-        room_id
+        userInfo {
+          userid
+          first_name
+          last_name
+          photo_profile
+        }
       }
     }
   }
 `;
-//  userInfo {
-//           userid
-//           first_name
-//           last_name
-//           fcm_token
-//           photo_profile
-//           type
-//           city
-//           state
-//           country
-//         }
 
 export const GET_COMMENT_BY_POST = gql`
   query GetCommentByPost($postId: String!, $page: Float!) {
@@ -194,7 +162,6 @@ export const GET_COMMENT_BY_POST = gql`
       post_id
       created
       modified
-      parent_id
       comment_id
       reply_count
       userInfo {
@@ -206,6 +173,29 @@ export const GET_COMMENT_BY_POST = gql`
     }
   }
 `;
+
+export const GET_COMMENT_BY_PARENT = gql`
+   query GetCommentByParent($parentId: String!, $page: Float!) {
+        getCommentByParentId(parentId: $parentId, page: $page) {
+            type
+            likes
+            status
+            comment
+            user_id
+            post_id
+            created
+            modified
+            parent_id
+            comment_id
+            reply_count
+            userInfo {
+              userid
+              last_name
+              first_name
+              photo_profile
+           }
+         }
+   }`;
 
 export const UPDATE_COMMENT = gql`
   mutation UpdateComment($input: UpdateCommentInput!) {

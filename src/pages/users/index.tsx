@@ -1,20 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import DataTable from "../../components/dataTable";
-import { useDispatch, useSelector } from "react-redux";
 import { GET_ALL_USER } from "../../redux/features/queries";
-import { setAllUser, setAllUserPage } from "../../redux/features/userSlice";
 
 const Users = () => {
   const pageSize = 10;
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const allUser = useSelector((state: any) => state.user.allUser);
-  const allUserPage = useSelector((state: any) => state.user.allUserPage);
-
-  // console.log("all user page", allUserPage);
 
   const {
     data: allUsersData,
@@ -23,24 +15,14 @@ const Users = () => {
     refetch: refetchUsersData,
   } = useQuery(GET_ALL_USER, {
     variables: {
-      page: allUserPage,
+      page: 1,
     },
     notifyOnNetworkStatusChange: true,
   });
 
   const handlePageChange = (page: number) => {
-    console.log("Page number :", page);
-    if (page !== 1) {
-      dispatch(setAllUserPage(page));
-      refetchUsersData({ page: page });
-    } else {
-      refetchUsersData({ page: allUserPage });
-    }
+    refetchUsersData({ page: page });
   };
-
-  useEffect(() => {
-    dispatch(setAllUser(allUsersData?.getAllUsers));
-  }, [allUsersData]);
 
   const UsersTableHeadings = [
     {
@@ -94,12 +76,12 @@ const Users = () => {
         <div className="w-full">
           <DataTable
             totalRows={100}
-            allData={allUser}
             pagination={true}
             selectableRows={true}
             userCursorPointer={true}
             loading={allUsersLoading}
             tableHeadings={UsersTableHeadings}
+            allData={allUsersData?.getAllUsers}
             onRowClicked={(rowData: any) =>
               navigate(`/userProfile/${rowData.userid}`, {
                 state: {
@@ -112,10 +94,10 @@ const Users = () => {
             }
             onChangePage={(e) => handlePageChange(e)}
             paginationPerPage={pageSize}
-            handlePreviousPageClick={() => {
-              dispatch(setAllUserPage(allUserPage - 1));
-              refetchUsersData({ page: allUserPage - 1 });
-            }}
+            // handlePreviousPageClick={() => {
+            //   dispatch(setAllUserPage(allUserPage - 1));
+            //   refetchUsersData({ page: allUserPage - 1 });
+            // }}
           />
 
           {allUsersErrors && (

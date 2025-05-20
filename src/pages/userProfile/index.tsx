@@ -6,20 +6,21 @@ import {
 } from "../../redux/features/queries";
 import toast from "react-hot-toast";
 import { Formik, Form } from "formik";
+import { FiSend } from "react-icons/fi";
 import { TbEdit } from "react-icons/tb";
+import { GrUpdate } from "react-icons/gr";
 import { useEffect, useState } from "react";
 import Spinner from "../../components/spinner";
 import CustomBtn from "../../components/customBtn";
+import { ReturnError } from "../../utils/functions";
 import CustomModal from "../../components/customModal";
 import { useMutation, useQuery } from "@apollo/client";
-import { MdOutlineDeleteForever } from "react-icons/md";
 import PostComponent from "../../components/postComponent";
-import { useLocation, useNavigate, useParams } from "react-router";
 import CustomInputField from "../../components/customInputField";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { MdExpandMore, MdOutlineDeleteForever } from "react-icons/md";
 import { UPDATE_PROFILE_INITIAL_VALUES } from "../../validations/initialValues";
 import { UPDATE_PROFILE_VALIDATION_SCHEMA } from "../../validations/validationSchema";
-import { GrUpdate } from "react-icons/gr";
-import { FiSend } from "react-icons/fi";
 
 const UserProfile = () => {
   const location = useLocation();
@@ -114,6 +115,10 @@ const UserProfile = () => {
     console.log("Values on update profile func", values);
   };
 
+  const DeletePostFromLocalState = (postid: string) => {
+    setAllPostsData((prev) => prev.filter((post) => post.postid !== postid));
+  };
+
   return (
     <>
       {profileDetailsError && (
@@ -150,11 +155,10 @@ const UserProfile = () => {
               className="w-full max-h-72 object-cover rounded-xl shadow-md"
               src={userProfileDetails?.getUser[0]?.photo_cover}
               alt="Profile Picture"
-              // src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
             />
             <img
               src={userProfileDetails?.getUser[0]?.photo_profile}
-              className="rounded-full h-36 w-36 mx-auto -mt-16"
+              className="rounded-full h-36 w-36 mx-auto -mt-16 border border-theme-primaryBorder"
             />
 
             <section className="space-y-2">
@@ -270,15 +274,30 @@ const UserProfile = () => {
 
                 {userFriendData?.getUserFriendList.values?.map(
                   (item: any, index: number) => (
-                    <div
+                    <span
                       key={index}
-                      className="rounded-full w-24 h-auto border-2 border-theme-primaryBorder p-4"
+                      className="text-center cursor-pointer"
+                      onClick={() => {
+                        setAllPostsData([]);
+                        navigate(`/userProfile/${item?.userInfo?.userid}`, {
+                          state: {
+                            profileData: {
+                              userId: item?.userInfo?.userid,
+                            },
+                          },
+                        });
+                      }}
                     >
-                      <p className="text-xs">
-                        {" "}
-                        {JSON.stringify(item?.friend_user_id)}
+                      <img
+                        src={item?.userInfo?.photo_profile}
+                        className="w-24 h-24 object-cover rounded-full border border-theme-primaryBorder"
+                      />
+                      <p className="text-sm break-words font-semibold text-theme-primary">
+                        {item?.userInfo?.first_name +
+                          " " +
+                          item?.userInfo?.last_name}
                       </p>
-                    </div>
+                    </span>
                   )
                 )}
               </div>
@@ -294,7 +313,7 @@ const UserProfile = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full">
                 {allPostData?.map((item: any, index: number) => (
                   <PostComponent
                     data={item}
@@ -302,10 +321,7 @@ const UserProfile = () => {
                     textSize={"sm"}
                     showIconNames={false}
                     key={item?.caption + index + 1}
-                    refetch={() => {
-                      setPostPage(1);
-                      loadMorePosts({ page: 1 });
-                    }}
+                    refetch={DeletePostFromLocalState}
                   />
                 ))}
               </div>
@@ -322,11 +338,12 @@ const UserProfile = () => {
                   <CustomBtn
                     type="button"
                     text="Load more"
+                    icon={<MdExpandMore size={24} />}
+                    className="text-sm !rounded-3xl m-6"
                     isLoading={userPostLoading}
                     handleOnClick={() => {
                       handleLoadMorePosts(postPage + 1);
                     }}
-                    className="text-sm !font-normal rounded-sm m-6"
                   />
                 </div>
               ) : (
@@ -394,7 +411,6 @@ const UserProfile = () => {
                         onSubmit={handleSubmit}
                         className="grid grid-cols-2 gap-4"
                       >
-                        {console.log(errors)}
                         <CustomInputField
                           type="text"
                           name="first_name"
@@ -402,11 +418,7 @@ const UserProfile = () => {
                           value={values.first_name}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.first_name && touched.first_name
-                              ? errors.first_name
-                              : ""
-                          }
+                          error={ReturnError(errors, touched, "first_name")}
                         />
 
                         <CustomInputField
@@ -416,11 +428,7 @@ const UserProfile = () => {
                           value={values.last_name}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.last_name && touched.last_name
-                              ? errors.last_name
-                              : ""
-                          }
+                          error={ReturnError(errors, touched, "last_name")}
                         />
 
                         <CustomInputField
@@ -430,9 +438,7 @@ const UserProfile = () => {
                           value={values.email}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.email && touched.email ? errors.email : ""
-                          }
+                          error={ReturnError(errors, touched, "email")}
                         />
 
                         <CustomInputField
@@ -442,9 +448,7 @@ const UserProfile = () => {
                           value={values.phone}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.phone && touched.phone ? errors.phone : ""
-                          }
+                          error={ReturnError(errors, touched, "phone")}
                         />
 
                         <CustomInputField
@@ -454,11 +458,7 @@ const UserProfile = () => {
                           value={values.country}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.country && touched.country
-                              ? errors.country
-                              : ""
-                          }
+                          error={ReturnError(errors, touched, "country")}
                         />
 
                         <CustomInputField
@@ -468,9 +468,7 @@ const UserProfile = () => {
                           value={values.state}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.state && touched.state ? errors.state : ""
-                          }
+                          error={ReturnError(errors, touched, "state")}
                         />
 
                         <CustomInputField
@@ -480,7 +478,7 @@ const UserProfile = () => {
                           value={values.city}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={errors.city && touched.city ? errors.city : ""}
+                          error={ReturnError(errors, touched, "city")}
                         />
 
                         <CustomInputField
@@ -490,11 +488,7 @@ const UserProfile = () => {
                           value={values.address}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.address && touched.address
-                              ? errors.address
-                              : ""
-                          }
+                          error={ReturnError(errors, touched, "address")}
                         />
 
                         <CustomInputField
@@ -504,11 +498,7 @@ const UserProfile = () => {
                           value={values.postalcode}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.postalcode && touched.postalcode
-                              ? errors.postalcode
-                              : ""
-                          }
+                          error={ReturnError(errors, touched, "postalcode")}
                         />
 
                         <CustomInputField
@@ -518,9 +508,7 @@ const UserProfile = () => {
                           value={values?.status}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={
-                            errors.status && touched.status ? errors.status : ""
-                          }
+                          error={ReturnError(errors, touched, "status")}
                         />
 
                         <CustomInputField
@@ -530,7 +518,7 @@ const UserProfile = () => {
                           value={values?.type}
                           onBlurHandle={handleBlur}
                           onChangeHandle={handleChange}
-                          error={errors.type && touched.type ? errors.type : ""}
+                          error={ReturnError(errors, touched, "type")}
                         />
 
                         <CustomBtn

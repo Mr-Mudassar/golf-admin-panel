@@ -5,8 +5,14 @@ const generalValidation = Yup.string()
   .min(2, "Value is too short")
   .max(300, "Value is too long");
 
+const COMMENT_VALIDATION = Yup.string()
+  .matches(/^[a-zA-Z0-9\s.,!?'"@#()&+-=]*$/, "Invalid characters detected")
+  .min(2, "Comment is too short")
+  .max(300, "Comment is too long")
+  .required("Comment is required");
+
 export const EDIT_COMMENT_VALIDATION_SCHEMA = Yup.object().shape({
-  comment: generalValidation,
+  comment: COMMENT_VALIDATION,
 });
 
 export const UPDATE_PROFILE_VALIDATION_SCHEMA = Yup.object().shape({

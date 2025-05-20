@@ -4,6 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineLogout } from "react-icons/hi";
 import { MdOutlineSettings } from "react-icons/md";
+import GolfGuidersLogo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegMoon, FaRegUserCircle } from "react-icons/fa";
 import { setAppMode } from "../../redux/features/userSlice";
@@ -58,12 +59,20 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         isSidebarOpen ? "md:pl-72" : "sm:pl-24"
       }`}
     >
-      <div className="flex justify-between">
-        <input
-          className="border border-theme-primaryBorder rounded-md p-2 bg-theme-secondaryBg text-theme-primary"
-          type="search"
-          placeholder="Search"
-        />
+      <div className={`flex items-center ${!isSidebarOpen ? " justify-between " : " justify-end "}`}>
+        {!isSidebarOpen && (
+          <>
+            <img
+              src={GolfGuidersLogo}
+              alt="golfguiders logo"
+              className="w-10 h-10"
+            />
+
+            <h1 className="text-theme-primary font-bold text-xl">
+              GolfGuiders
+            </h1>
+          </>
+        )}
 
         <div
           className="cursor-pointer flex items-center"
@@ -83,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         {/* Modal  */}
 
         {userDetailsModel && (
-          <div className="absolute right-6 md:right-14 top-20 px-4 py-4 bg-theme-primaryBg rounded-xl w-64 shadow-lg z-50">
+          <div className="absolute right-6 md:right-14 top-20 px-4 py-4 bg-theme-primaryBg rounded-xl w-64 border border-theme-primaryBorder shadow-lg z-50">
             {/* user name and image  */}
             <div className="flex gap-2">
               <span className="text-center my-auto">

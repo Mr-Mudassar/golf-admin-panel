@@ -2,20 +2,16 @@ import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
   GET_COMMENT_BY_POST,
+  GET_COMMENT_BY_PARENT,
 } from "../../redux/features/queries";
 import Spinner from "../spinner";
 import toast from "react-hot-toast";
 import CustomBtn from "../customBtn";
-import { Form, Formik } from "formik";
-import { TbEdit } from "react-icons/tb";
 import CustomModal from "../customModal";
-import { RxCross2 } from "react-icons/rx";
 import { useEffect, useState } from "react";
-import CustomInputField from "../customInputField";
-import { useMutation, useQuery } from "@apollo/client";
-import { MdOutlineDeleteForever } from "react-icons/md";
-import { EDIT_COMMENT_INITIAL_VALUES } from "../../validations/initialValues";
-import { EDIT_COMMENT_VALIDATION_SCHEMA } from "../../validations/validationSchema";
+import SingleComment from "../singleComment";
+import { MdExpandMore, MdOutlineDeleteForever } from "react-icons/md";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 
 interface CommentsComponentProps {
   postData: any;
@@ -23,14 +19,18 @@ interface CommentsComponentProps {
 
 const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
   const { postData } = props;
-  const [postComments, setPostComments] = useState([]);
+  const [commentPage, setCommentPage] = useState<number>(1);
+  const [postComments, setPostComments] = useState<any[]>([]);
+  const [commentParentId, setCommentParentID] = useState<string>();
+  const [commentReplyPage, setCommentReplyPage] = useState<number>(1);
   const [deleteableCommentId, setDeleteableCommentId] = useState<any>();
-  const [showDeleteProfileModal, setShowDeleteProfileModal] = useState(false);
+  const [commentReplyDataArr, setCommentReplyDataArr] = useState<any[]>([]);
+  const [replyCommentModal, showReplyCommentModal] = useState<boolean>(false);
+  const [showDeleteProfileModal, setShowDeleteProfileModal] =
+    useState<boolean>(false);
   const [editableCommentId, setEditableCommentId] = useState<number | null>(
     null
   );
-
-  console.log("delted comment id", deleteableCommentId);
 
   const {
     data: postCommentData,
@@ -39,17 +39,46 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
     refetch: refetchPostComment,
   } = useQuery(GET_COMMENT_BY_POST, {
     variables: {
-      page: 1,
+      page: commentPage,
       postId: postData?.postid,
     },
   });
 
   useEffect(() => {
-    setPostComments(postCommentData?.getCommentByPost);
+    if (postCommentData?.getCommentByPost) {
+      setPostComments((prev: any[]) => {
+        const filteredComments = postCommentData?.getCommentByPost.filter(
+          (newComment: any) =>
+            !prev.some(
+              (existingComment: any) =>
+                existingComment.comment_id === newComment.comment_id
+            )
+        );
+        return [...prev, ...filteredComments];
+      });
+    }
   }, [postCommentData]);
+
+  const handleLoadMoreComments = async (commentPage: number) => {
+    refetchPostComment({
+      variables: {
+        page: commentPage,
+        postId: postData?.postid,
+      },
+    });
+    setCommentPage(commentPage);
+  };
 
   const [udaptedComment, { loading: updateCommentLoading }] =
     useMutation(UPDATE_COMMENT);
+
+  const UpdateCommentFromLocalState = (comment: any) => {
+    setPostComments((prev: any[]) =>
+      prev.map((item: any) =>
+        item.comment_id === editableCommentId ? { ...comment } : item
+      )
+    );
+  };
 
   const handleCommentUpdate = (values: any) => {
     udaptedComment({
@@ -59,9 +88,10 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
         },
       },
       onCompleted: () => {
-        refetchPostComment();
-        toast.success("Comment updated successfully!");
+        UpdateCommentFromLocalState({ comment: values?.comment });
+        UpdateCommentReplyFromLocal({ comment: values?.comment });
         setEditableCommentId(null);
+        toast.success("Comment updated successfully!");
       },
       onError: () => {
         toast.error("Error updating comment");
@@ -73,132 +103,169 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
   const [deleteComment, { loading: deleteCommentLoading }] =
     useMutation(DELETE_COMMENT);
 
+  const DeleteCommentFromLocalState = () => {
+    setPostComments((prev: any) =>
+      prev.filter(
+        (item: any) => item.comment_id !== deleteableCommentId?.comment_id
+      )
+    );
+  };
+
+  const [
+    FetchReply,
+    {
+      data: commentReplyData,
+      error: commentReplyError,
+      loading: commentReplyLoading,
+    },
+  ] = useLazyQuery(GET_COMMENT_BY_PARENT);
+
+  useEffect(() => {
+    if (commentReplyData?.getCommentByParentId) {
+      setCommentReplyDataArr((prev: any[]) => {
+        const filteredComments = commentReplyData?.getCommentByParentId.filter(
+          (newComment: any) =>
+            !prev.some(
+              (existingComment: any) =>
+                existingComment.comment_id === newComment.comment_id
+            )
+        );
+        return [...prev, ...filteredComments];
+      });
+    }
+  }, [commentReplyData]);
+
+  const handleLoadMoreReply = async (replyPage: number) => {
+    console.log(replyPage);
+    FetchReply({
+      variables: {
+        page: replyPage,
+        parentId: commentParentId,
+      },
+    });
+    setCommentReplyPage(replyPage);
+  };
+
+  const DeleteCommentReplyFromLocal = () => {
+    setCommentReplyDataArr((prev: any[]) =>
+      prev?.filter(
+        (item: any) => item.comment_id !== deleteableCommentId?.comment_id
+      )
+    );
+  };
+
+  const UpdateCommentReplyFromLocal = (comment: any) => {
+    setCommentReplyDataArr((prev: any[]) =>
+      prev?.map((item: any) =>
+        item.comment_id === editableCommentId ? { ...comment } : item
+      )
+    );
+  };
+
+
   return (
     <div>
-      {postCommentLoading && (
-        <div className="flex justify-center">
-          <Spinner />
-        </div>
-      )}
       {postCommentError && (
         <div className="flex justify-center items-center p-8">
           <p className="text-red-600">Failed to load comments</p>
         </div>
       )}
       {postComments?.map((item: any, index: number) => (
-        <div
-          key={index + item?.comment_id}
-          className="flex flex-col sm:flex-row gap-2 mb-4 w-full items-center"
-        >
-          <img
-            src={item?.userInfo?.photo_profile}
-            alt={item?.userInfo?.photo_profile}
-            className="rounded-full w-12 h-12"
-          />
-          <div className="w-full">
-            <div className="bg-theme-secondaryBg rounded-lg p-3 ml-4">
-              <div className="flex justify-between items-center">
-                <p className="text-theme-primary text-md font-semibold">
-                  {item?.userInfo?.first_name + " " + item?.userInfo?.last_name}
-                </p>
-
-                <span className="flex gap-2 cursor-pointer">
-                  {editableCommentId === item?.comment_id ? (
-                    <RxCross2
-                      size={32}
-                      onClick={() => setEditableCommentId(null)}
-                      className="hover:bg-theme-primaryBg rounded-md text-theme-secondary p-1"
-                    />
-                  ) : (
-                    <>
-                      <TbEdit
-                        size={20}
-                        onClick={() => setEditableCommentId(item.comment_id)}
-                        className="text-theme-btnBgText"
-                      />
-                      <MdOutlineDeleteForever
-                        size={22}
-                        onClick={() => {
-                          setDeleteableCommentId(item);
-                          setShowDeleteProfileModal(true);
-                        }}
-                        className="text-red-600 cursor-pointer"
-                      />
-                    </>
-                  )}
-                </span>
-              </div>
-              {editableCommentId === item.comment_id ? (
-                <Formik
-                  initialValues={{
-                    ...EDIT_COMMENT_INITIAL_VALUES,
-                    comment: item?.comment,
-                  }}
-                  onSubmit={(values) =>
-                    handleCommentUpdate({
-                      ...values,
-                      type: item?.type,
-                      likes: item.likes,
-                      status: item?.status,
-                      post_id: item?.post_id,
-                      created: item?.created,
-                      modified: item?.modified,
-                      parent_id: item?.parent_id,
-                      comment_id: item?.comment_id,
-                      reply_count: item?.reply_count,
-                    })
-                  }
-                  validationSchema={EDIT_COMMENT_VALIDATION_SCHEMA}
-                >
-                  {({
-                    values,
-                    // errors,
-                    // touched,
-                    handleBlur,
-                    handleSubmit,
-                    handleChange,
-                  }) => (
-                    <Form onSubmit={handleSubmit}>
-                      <CustomInputField
-                        rows={3}
-                        cols={100}
-                        name={"comment"}
-                        type={"textarea"}
-                        value={values?.comment}
-                        onBlurHandle={handleBlur}
-                        onChangeHandle={handleChange}
-                        disabled={editableCommentId !== item.comment_id}
-                        // error={
-                        //   errors.comment && touched.comment
-                        //     ? errors.comment
-                        //     : ""
-                        // }
-                      />
-                      <CustomBtn
-                        type={"submit"}
-                        text={"Update"}
-                        isLoading={updateCommentLoading}
-                        className="font-normal text-sm px-2 rounded-sm"
-                      />
-                    </Form>
-                  )}
-                </Formik>
-              ) : (
-                <p className="text-theme-secondary text-lg">{item?.comment}</p>
-              )}
-            </div>
-            <div className="ml-4 flex justify-around text-xs text-theme-secondary font-semibold">
-              <p>{"2 days ago"}</p>
-              <button onClick={() => window.alert("Like")}>
-                Like({item?.likes?.length || 0})
-              </button>
-              <button onClick={() => window.alert("Reply")}>
-                Reply({item?.reply_count || 0})
-              </button>
-            </div>
-          </div>
-        </div>
+        <SingleComment
+          item={item}
+          FetchReply={FetchReply}
+          key={index + item.comment_id}
+          editableCommentId={editableCommentId}
+          setCommentParentID={setCommentParentID}
+          handleCommentUpdate={handleCommentUpdate}
+          updateCommentLoading={updateCommentLoading}
+          setEditableCommentId={setEditableCommentId}
+          showReplyCommentModal={showReplyCommentModal}
+          setDeleteableCommentId={setDeleteableCommentId}
+          setShowDeleteProfileModal={setShowDeleteProfileModal}
+        />
       ))}
+
+      {postCommentLoading && (
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      )}
+      {!postCommentError && postCommentData?.getCommentByPost?.length === 10 ? (
+        <div className="flex justify-center">
+          <CustomBtn
+            type="button"
+            text="Load more"
+            isLoading={postCommentLoading}
+            icon={<MdExpandMore size={24} />}
+            className="text-sm !rounded-3xl m-6"
+            handleOnClick={() => {
+              handleLoadMoreComments(commentPage + 1);
+            }}
+          />
+        </div>
+      ) : (
+        <div className="flex justify-center items-center py-8">
+          <p className="text-theme-secondary">No more comments</p>
+        </div>
+      )}
+
+      <CustomModal
+        heading={"Comment replies"}
+        isOpen={replyCommentModal}
+        modelSize="w-[80%] md:w-[60%] lg:w-[40%]"
+        toggle={() => showReplyCommentModal(!replyCommentModal)}
+        description={
+          <>
+            {commentReplyLoading && (
+              <div className="flex justify-center">
+                <Spinner />
+              </div>
+            )}
+            {commentReplyError && (
+              <div className="flex justify-center items-center p-8">
+                <p className="text-red-600">Failed to load comments</p>
+              </div>
+            )}
+
+            {commentReplyDataArr?.map((item: any, index: number) => (
+              <SingleComment
+                item={item}
+                FetchReply={FetchReply}
+                key={index + item?.comment_id}
+                editableCommentId={editableCommentId}
+                setCommentParentID={setCommentParentID}
+                handleCommentUpdate={handleCommentUpdate}
+                updateCommentLoading={updateCommentLoading}
+                setEditableCommentId={setEditableCommentId}
+                showReplyCommentModal={showReplyCommentModal}
+                setDeleteableCommentId={setDeleteableCommentId}
+                setShowDeleteProfileModal={setShowDeleteProfileModal}
+              />
+            ))}
+
+            {!commentReplyLoading &&
+            commentReplyData?.getCommentByParentId?.length >= 10 ? (
+              <div className="flex justify-center">
+                <CustomBtn
+                  type="button"
+                  text="Load more"
+                  isLoading={commentReplyLoading}
+                  icon={<MdExpandMore size={24} />}
+                  className="text-sm !rounded-3xl m-6"
+                  handleOnClick={() => {
+                    handleLoadMoreReply(commentReplyPage + 1);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="flex justify-center items-center py-8">
+                <p className="text-theme-secondary">No more comments</p>
+              </div>
+            )}
+          </>
+        }
+      />
 
       <CustomModal
         modelSize="max-w-md"
@@ -213,7 +280,10 @@ const CommentsComponent: React.FC<CommentsComponentProps> = (props) => {
               CommentCreated: deleteableCommentId?.created,
             },
             onCompleted: () => {
-              refetchPostComment();
+              // refetchReplies();
+              // refetchPostComment();
+              DeleteCommentFromLocalState();
+              DeleteCommentReplyFromLocal();
               setShowDeleteProfileModal(false);
               toast.success("Comment deleted successfully!");
             },

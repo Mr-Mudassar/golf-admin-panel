@@ -26,22 +26,17 @@ const FillBtn: React.FC<CustomBtnProps> = (props) => {
   return (
     <button
       type={type}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       onClick={handleOnClick}
       className={`
-         text-md bg-theme-btnBg text-theme-btnColor rounded-lg font-semibold px-4 py-2
+         text-md bg-theme-btnBg hover:bg-theme-btnColorHover text-theme-btnColor rounded-lg font-semibold px-4 py-2
         ${className}
       `}
     >
-      {!isLoading ? (
-        <>
-          <span className="flex items-center ">
-            {icon} {text}
-          </span>
-        </>
-      ) : (
-        <Spinner size="h-8 w-8 !ng-white" />
-      )}
+      <span className="flex items-center ">
+        {!isLoading ? icon : <Spinner size="h-6 w-6 !bg-gray-200 mr-2" />}
+        {text}
+      </span>
     </button>
   );
 };

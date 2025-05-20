@@ -8,12 +8,13 @@ import { VscComment } from "react-icons/vsc";
 import { IoMdShareAlt } from "react-icons/io";
 import { HiDotsVertical } from "react-icons/hi";
 import CommentsComponent from "../commentsComponent";
+import moment from "moment";
 
 interface PostComponentProps {
   data: any;
+  refetch: any;
   textSize?: string;
   iconsSize?: number;
-  refetch: () => void;
   showIconNames?: boolean;
 }
 
@@ -62,7 +63,7 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
   ];
 
   return (
-    <div className="border border-theme-primaryBorder rounded-xl mb-4 bg-theme-primaryBg flex flex-col h-full">
+    <div className="border border-theme-primaryBorder rounded-xl mb-4 bg-theme-primaryBg flex flex-col h-max ">
       <div>
         <div className="flex justify-between items-center m-4">
           <span
@@ -82,14 +83,16 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
               <img
                 src={data?.userInfo?.photo_profile}
                 alt={data?.userInfo?.photo_profile}
-                className="rounded-full w-14 h-14 object-cover"
+                className="rounded-full !w-14 !h-14 object-cover border border-theme-primaryBorder"
               />
             )}
             <span>
               <h1 className="text-md text-theme-primary font-semibold">
                 {data?.userInfo?.first_name + " " + data?.userInfo?.last_name}
               </h1>
-              <p className="text-theme-secondary text-sm">1 day ago</p>
+              <p className="text-theme-secondary text-sm">
+                {moment(parseInt(data?.created)).fromNow()}
+              </p>
             </span>
           </span>
 
@@ -99,7 +102,13 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
               onClick={() => setShowActionMenu(!showActionMenu)}
               className="text-theme-primary hover:bg-theme-secondaryBg p-1 cursor-pointer rounded-lg"
             />
-            {showActionMenu && <ActionMenu postData={data} refetch={refetch} />}
+            {showActionMenu && (
+              <ActionMenu
+                postData={data}
+                refetch={refetch}
+                onClose={() => setShowActionMenu(false)}
+              />
+            )}
           </div>
         </div>
 
@@ -107,7 +116,11 @@ const PostComponent: React.FC<PostComponentProps> = (props) => {
           {data?.description}
         </p>
       </div>
-      {data?.has_media && <MediaLoading postId={data?.postid} />}
+      {data?.has_media && (
+        <div>
+          <MediaLoading postId={data?.postid} />
+        </div>
+      )}
       <div className="mt-auto">
         <section className="grid grid-cols-3 border-t border-theme-primaryBorder ">
           {ActionOnPosts.map((item, index) => (
