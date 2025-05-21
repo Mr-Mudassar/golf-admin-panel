@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { FaAsterisk } from "react-icons/fa";
 
 interface DropdownProps {

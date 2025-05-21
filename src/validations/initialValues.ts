@@ -19,4 +19,6 @@ export const UPDATE_PROFILE_INITIAL_VALUES = {
   status: "",
   // hobbies: [],
   gender: "",
+  photo_profile: "",
+  photo_cover: ""
 };

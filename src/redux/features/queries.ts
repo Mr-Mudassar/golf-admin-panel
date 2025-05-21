@@ -175,27 +175,28 @@ export const GET_COMMENT_BY_POST = gql`
 `;
 
 export const GET_COMMENT_BY_PARENT = gql`
-   query GetCommentByParent($parentId: String!, $page: Float!) {
-        getCommentByParentId(parentId: $parentId, page: $page) {
-            type
-            likes
-            status
-            comment
-            user_id
-            post_id
-            created
-            modified
-            parent_id
-            comment_id
-            reply_count
-            userInfo {
-              userid
-              last_name
-              first_name
-              photo_profile
-           }
-         }
-   }`;
+  query GetCommentByParent($parentId: String!, $page: Float!) {
+    getCommentByParentId(parentId: $parentId, page: $page) {
+      type
+      likes
+      status
+      comment
+      user_id
+      post_id
+      created
+      modified
+      parent_id
+      comment_id
+      reply_count
+      userInfo {
+        userid
+        last_name
+        first_name
+        photo_profile
+      }
+    }
+  }
+`;
 
 export const UPDATE_COMMENT = gql`
   mutation UpdateComment($input: UpdateCommentInput!) {
@@ -227,8 +228,9 @@ export const DELETE_COMMENT = gql`
 
 export const UPDATE_USER_PROFILE = gql`
   mutation UpdateUserProfile($updatedData: CassandraUpdateUserInput!) {
-    updateUser(CassandraUpdateUserInput: $updatedData) {
+    updateUser(updateUserInput: $updatedData) {
       last_name
+      first_name
     }
   }
 `;
@@ -248,3 +250,9 @@ export const UPDATE_USER_PROFILE = gql`
 //       $status: String
 //       $hobbies: [String!]
 //       $gender: String
+
+export const CREATE_MEDIA = gql`
+   mutation CreateMedia($medias: [Upload!]!) {
+       createMedias(medias: $medias) 
+   }
+`;

@@ -5,22 +5,17 @@ import {
   GET_ALL_POST_OF_SINGLE_USER,
 } from "../../redux/features/queries";
 import toast from "react-hot-toast";
-import { Formik, Form } from "formik";
-import { FiSend } from "react-icons/fi";
 import { TbEdit } from "react-icons/tb";
 import { GrUpdate } from "react-icons/gr";
 import { useEffect, useState } from "react";
 import Spinner from "../../components/spinner";
 import CustomBtn from "../../components/customBtn";
-import { ReturnError } from "../../utils/functions";
 import CustomModal from "../../components/customModal";
 import { useMutation, useQuery } from "@apollo/client";
 import PostComponent from "../../components/postComponent";
-import CustomInputField from "../../components/customInputField";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { MdExpandMore, MdOutlineDeleteForever } from "react-icons/md";
-import { UPDATE_PROFILE_INITIAL_VALUES } from "../../validations/initialValues";
-import { UPDATE_PROFILE_VALIDATION_SCHEMA } from "../../validations/validationSchema";
+import UpdateUserProfileForm from "../../components/forms/updateUserProfileForm";
 
 const UserProfile = () => {
   const location = useLocation();
@@ -41,6 +36,7 @@ const UserProfile = () => {
     data: userProfileDetails,
     loading: profileDetailsLoading,
     error: profileDetailsError,
+    refetch: RefetchUserProfileDetails,
   } = useQuery(GET_USER_PROFILE, {
     variables: {
       userId: ProfileData?.userId,
@@ -110,10 +106,6 @@ const UserProfile = () => {
       toast.error("Error Deleting User"), setShowDeleteProfileModal(false);
     },
   });
-
-  const handleUpdateProfileFunc = (values: any) => {
-    console.log("Values on update profile func", values);
-  };
 
   const DeletePostFromLocalState = (postid: string) => {
     setAllPostsData((prev) => prev.filter((post) => post.postid !== postid));
@@ -338,9 +330,9 @@ const UserProfile = () => {
                   <CustomBtn
                     type="button"
                     text="Load more"
+                    isLoading={userPostLoading}
                     icon={<MdExpandMore size={24} />}
                     className="text-sm !rounded-3xl m-6"
-                    isLoading={userPostLoading}
                     handleOnClick={() => {
                       handleLoadMorePosts(postPage + 1);
                     }}
@@ -390,147 +382,11 @@ const UserProfile = () => {
               }
               toggle={() => setShowUpdateProfileModal(!showUpdateProfileModal)}
               description={
-                <div className="border-2 border-theme-primaryBorder rounded-lg p-4">
-                  <Formik
-                    initialValues={{
-                      ...UPDATE_PROFILE_INITIAL_VALUES,
-                      ...userProfileDetails.getUser[0],
-                    }}
-                    validationSchema={UPDATE_PROFILE_VALIDATION_SCHEMA}
-                    onSubmit={(values) => handleUpdateProfileFunc(values)}
-                  >
-                    {({
-                      values,
-                      errors,
-                      touched,
-                      handleBlur,
-                      handleSubmit,
-                      handleChange,
-                    }) => (
-                      <Form
-                        onSubmit={handleSubmit}
-                        className="grid grid-cols-2 gap-4"
-                      >
-                        <CustomInputField
-                          type="text"
-                          name="first_name"
-                          label="First Name"
-                          value={values.first_name}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "first_name")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="last_name"
-                          label="Last Name"
-                          value={values.last_name}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "last_name")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="email"
-                          label="Email"
-                          value={values.email}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "email")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="phone"
-                          label="Phone Number"
-                          value={values.phone}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "phone")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="country"
-                          label="Country"
-                          value={values.country}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "country")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="state"
-                          label="State"
-                          value={values.state}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "state")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="city"
-                          label="City"
-                          value={values.city}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "city")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="address"
-                          label="Address"
-                          value={values.address}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "address")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="postalcode"
-                          label="Postal Code"
-                          value={values.postalcode}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "postalcode")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="status"
-                          label="Status"
-                          value={values?.status}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "status")}
-                        />
-
-                        <CustomInputField
-                          type="text"
-                          name="type"
-                          label="Type"
-                          value={values?.type}
-                          onBlurHandle={handleBlur}
-                          onChangeHandle={handleChange}
-                          error={ReturnError(errors, touched, "type")}
-                        />
-
-                        <CustomBtn
-                          type="submit"
-                          text="SUBMIT"
-                          icon={<FiSend size={18} className="mr-2" />}
-                          className="flex justify-center w-full !h-9.5 rounded-sm mt-6"
-                        />
-                      </Form>
-                    )}
-                  </Formik>
-                </div>
+                <UpdateUserProfileForm
+                  userProfileDetails={userProfileDetails}
+                  setShowUpdateProfileModal={setShowUpdateProfileModal}
+                  RefetchUserProfileDetails={RefetchUserProfileDetails}
+                />
               }
             />
           </div>
