@@ -75,7 +75,7 @@ const Users = () => {
       <div className="flex flex-col items-center justify-center">
         <div className="w-full">
           <DataTable
-            totalRows={100}
+            totalRows={1000}
             pagination={true}
             selectableRows={true}
             userCursorPointer={true}
@@ -94,10 +94,12 @@ const Users = () => {
             }
             onChangePage={(e) => handlePageChange(e)}
             paginationPerPage={pageSize}
-            // handlePreviousPageClick={() => {
-            //   dispatch(setAllUserPage(allUserPage - 1));
-            //   refetchUsersData({ page: allUserPage - 1 });
-            // }}
+            handleFirstPageClick={() => {
+              refetchUsersData({
+                page: 1,
+              });
+              window.location.reload();
+            }}
           />
 
           {allUsersErrors && (

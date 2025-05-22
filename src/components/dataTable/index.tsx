@@ -28,7 +28,7 @@ export interface DataTableComponentProps<T> {
   selectableRowDisabled?: (row: T) => boolean;
   onChangePage?: (page: number, totalRows: number) => void;
   onRowClicked?: (row: T, event: React.MouseEvent) => void;
-  handlePreviousPageClick?: () => void;
+  handleFirstPageClick?: () => void;
   handleSelectedRowsChange?: (selected: {
     selectedRows: string[] | T[];
   }) => void;
@@ -53,7 +53,7 @@ const DataTableComponent = <T,>({
   pagination = false,
   onChangeRowsPerPage,
   selectableRowDisabled,
-  handlePreviousPageClick,
+  handleFirstPageClick,
   handleSelectedRowsChange,
   userCursorPointer = false,
 }: DataTableComponentProps<T>) => {
@@ -114,7 +114,9 @@ const DataTableComponent = <T,>({
         theme={AppMode}
         paginationServer
         highlightOnHover
+        persistTableHead
         pagination={pagination}
+        progressPending={loading}
         customStyles={customStyles}
         onRowClicked={onRowClicked}
         onChangePage={onChangePage}
@@ -127,20 +129,20 @@ const DataTableComponent = <T,>({
         selectableRowDisabled={selectableRowDisabled}
         onSelectedRowsChange={handleSelectedRowsChange}
         columns={tableHeadings as unknown as DataTableColumn<T>[]}
-        persistTableHead
-        progressPending={loading}
         noDataComponent={
           <div className="py-8">
             <div className="text-theme-primary py-4 text-center">
               No records found
             </div>
-            <CustomBtn
-              type="button"
-              text={"Previous Page"}
-              handleOnClick={handlePreviousPageClick}
-              className=" font-normal text-sm rounded-sm"
-              icon={<IoMdArrowBack size={20} className="mr-2" />}
-            />
+            <div className="flex gap-4">
+              <CustomBtn
+                type="button"
+                text={"Back to first page"}
+                handleOnClick={handleFirstPageClick}
+                className=" font-normal text-sm rounded-sm"
+                icon={<IoMdArrowBack size={20} className="mr-2" />}
+              />
+            </div>
           </div>
         }
         paginationComponentOptions={{

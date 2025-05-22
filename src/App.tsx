@@ -43,7 +43,7 @@ const App: React.FC = () => {
   useEffect(() => {
     dispatch(
       setToken(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMGZiNDViOS1iYjkwLTQzMDYtOTRjYS02MjMxYjk1YTNjYmUiLCJlbWFpbCI6ImJpbGFsQHNldHViby5jb20iLCJpYXQiOjE3NDc0NzI2MjcsImV4cCI6MTc1MDA2NDYyN30.z0CW8zH3YpYDVAzg8zGnx8pPk4ds1uZDUZGzrk7Z4U0"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMGI5MjhhMi1lYTcwLTQ3MWQtYTRkNS1jOTgwY2ZlOGQ0NGMiLCJlbWFpbCI6ImJpbGFsQHNldHViby5jb20iLCJpYXQiOjE3NDc4NTI5NTMsImV4cCI6MTc1MDQ0NDk1M30.3XqoKzthJqduJliLYj91xQdhjjHYSuo7DsK-gBYoRB4"
       )
     );
   }, []);
